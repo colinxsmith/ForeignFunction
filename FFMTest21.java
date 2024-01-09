@@ -13,7 +13,7 @@ public class FFMTest21 {
 
     // 3. Convert Java String to C string and store it in off-heap memory
     try (Arena offHeap = Arena.ofConfined()) {
-      MemorySegment str = offHeap.allocateUtf8String("Happy Coding!");
+      MemorySegment str = offHeap.allocateUtf8String("Colin Smith");
 
       // 4. Invoke the foreign function
       long len = (long) strlen.invoke(str);
