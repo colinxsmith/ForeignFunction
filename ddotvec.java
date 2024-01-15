@@ -13,20 +13,18 @@ public class ddotvec {
 
       MethodHandle dsumvec = Linker.nativeLinker().downcallHandle(
           safeqp.find("ddotvec").orElseThrow(),
-          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS,
-              ValueLayout.ADDRESS));
-      MemorySegment A = offHeap.allocateArray(ValueLayout.ADDRESS, a.length);
+          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE),
+              ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE)));
+      MemorySegment A = offHeap.allocateArray(ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE), a.length);
       for (int i = 0; i < a.length; i++) {
-        MemorySegment cDouble = offHeap.allocate(ValueLayout.JAVA_DOUBLE, a[i]);
-        A.setAtIndex(ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE), i, cDouble);
+        A.setAtIndex(ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE), i, offHeap.allocate(ValueLayout.JAVA_DOUBLE, a[i]));
       }
       MemorySegment B = offHeap.allocateArray(ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE), b.length);
       for (int i = 0; i < b.length; i++) {
-        MemorySegment cDouble = offHeap.allocate(ValueLayout.JAVA_DOUBLE, b[i]);
-        B.setAtIndex(ValueLayout.ADDRESS, i, cDouble);
+        B.setAtIndex(ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE), i, offHeap.allocate(ValueLayout.JAVA_DOUBLE, b[i]));
       }
 
-      var back = dsumvec.invoke(n, A, B);
+      var back = (double)dsumvec.invokeExact(n,A,B);
       System.out.println("sum of elements " + back);
     }
   }
