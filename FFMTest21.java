@@ -1,5 +1,6 @@
 import java.lang.foreign.*;
-import java.lang.invoke.MethodHandle;
+import java.lang.invoke.*;
+
 //run via  java  --enable-preview --enable-native-access=ALL-UNNAMED --source 21 FFMTest21.java
 public class FFMTest21 {
   public static void main(String[] args) throws Throwable {
