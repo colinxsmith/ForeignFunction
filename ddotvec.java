@@ -11,7 +11,7 @@ public class ddotvec {
     try (Arena offHeap = Arena.ofConfined()) {
       final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", offHeap);
 
-      MethodHandle dsumvec = Linker.nativeLinker().downcallHandle(
+      MethodHandle ddotvec = Linker.nativeLinker().downcallHandle(
           safeqp.find("ddotvec").orElseThrow(),
           FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS,
               ValueLayout.ADDRESS));
@@ -30,7 +30,7 @@ public class ddotvec {
         System.out.println("b[" + i + "] = " + B.getAtIndex(ValueLayout.JAVA_DOUBLE, i));
       }
 
-      var back = (double) dsumvec.invokeExact(n, A, B);
+      var back = (double) ddotvec.invokeExact(n, A, B);
       System.out.println("sum of elements in A (= scalar product A.B); " + back);
     }
   }
