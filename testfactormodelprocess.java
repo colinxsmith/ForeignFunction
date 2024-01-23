@@ -16,5 +16,6 @@ public class testfactormodelprocess {
         double diff = OptimiserFunctions.ddotvec((nf + 1) * n, Q1, Q1);
         assert diff < OptimiserFunctions.lm_eps;
         System.out.println("Agreement difference "+diff);
+        OptimiserFunctions.daddvec((nf + 1) * n, Q, Q1, Q1);
     }
 }

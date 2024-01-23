@@ -4,11 +4,15 @@ package com.bitaplus.BitaModel.Optimisation;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.SymbolLookup.*;
 import java.lang.foreign.ValueLayout;
 
 public class OptimiserFunctions {
-  public static double lm_eps = Math.abs((((double)4) / 3 - 1) * 3 - 1);  //Machine accuracy
+  public static double lm_eps = Math.abs((((double) 4) / 3 - 1) * 3 - 1); // Machine accuracy
+
   public static double[][] Allocate2D(int n, int m) {
     double[][] y = new double[n][m];
     return y;
@@ -138,5 +142,93 @@ public class OptimiserFunctions {
     } catch (Throwable e) {
       System.out.println(e);
     }
+  }
+
+  public static void daddvec(long n, double[] a, double[] b, double[] c) {
+
+    try (Arena foreign = Arena.ofConfined()) {
+      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      var daddvecnative = Linker.nativeLinker().downcallHandle(
+          safeqp.find("daddvec").orElseThrow(),
+          FunctionDescriptor.ofVoid(
+              ValueLayout.JAVA_LONG,
+              ValueLayout.ADDRESS,
+              ValueLayout.ADDRESS,
+              ValueLayout.ADDRESS));
+      var aa = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, a.length);
+      for (int i = 0; i < a.length; i++) {
+        aa.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a[i]);
+      }
+      var bb = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, b.length);
+      for (int i = 0; i < b.length; i++) {
+        bb.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b[i]);
+      }
+      var cc = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, c.length);
+      for (int i = 0; i < c.length; i++) {
+        cc.setAtIndex(ValueLayout.JAVA_DOUBLE, i, c[i]);
+      }
+      daddvecnative.invokeExact(
+          n,
+          aa,
+          bb,
+          cc);
+      for (int i = 0; i < a.length; i++) {
+        a[i] = aa.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+      }
+      for (int i = 0; i < b.length; i++) {
+        b[i] = bb.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+      }
+      for (int i = 0; i < c.length; i++) {
+        c[i] = cc.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+      }
+    } catch (Throwable e) {
+      System.out.println(e);
+    }
+  }
+
+  public static double dsumvec(long n, double[] ss) {
+    double back;
+    try (Arena foreign = Arena.ofConfined()) {
+      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      var dsumvecnative = Linker.nativeLinker().downcallHandle(
+          safeqp.find("dsumvec").orElseThrow(),
+          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+              ValueLayout.JAVA_LONG,
+              ValueLayout.ADDRESS));
+      var ssss = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, ss.length);
+      for (int i = 0; i < ss.length; i++) {
+        ssss.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ss[i]);
+      }
+      back = (double) dsumvecnative.invokeExact(
+          n,
+          ssss);
+      for (int i = 0; i < ss.length; i++) {
+        ss[i] = ssss.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+      }
+    } catch (Throwable e) {
+      System.out.println(e);
+      back = 0.0;
+    }
+    return back;
+  }
+
+  public static String version() {
+    String back = "                                                                                                                                                                                                                                                                                                                                                                                                          ";
+    try (Arena foreign = Arena.ofConfined()) {
+      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      var versionnative = Linker.nativeLinker().downcallHandle(
+          safeqp.find("version").orElseThrow(),
+          FunctionDescriptor.of(ValueLayout.ADDRESS,
+              ValueLayout.ADDRESS));
+      var aa = foreign.allocateUtf8String(back);
+      var bb=aa;
+      bb = (MemorySegment) versionnative.invokeExact(aa);
+      back = aa.getUtf8String(0);
+    }
+
+    catch (Throwable e) {
+      System.out.println(e);
+    }
+    return back;
   }
 }
