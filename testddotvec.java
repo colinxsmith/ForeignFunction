@@ -1,5 +1,3 @@
-import javax.management.openmbean.OpenDataException;
-
 import com.bitaplus.BitaModel.Optimisation.*;
 
 //compile with;   javac  --enable-preview  --source 21 -Xlint:preview  testddotvec.java

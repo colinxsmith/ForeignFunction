@@ -4,10 +4,8 @@ package com.bitaplus.BitaModel.Optimisation;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
-import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
-import java.lang.foreign.SymbolLookup.*;
 import java.lang.foreign.ValueLayout;
 
 public class OptimiserFunctions {
@@ -213,7 +211,8 @@ public class OptimiserFunctions {
   }
 
   public static String version() {
-    String back = "                                                                                                                                                                                                                                                                                                                                                                                                          ";
+    char[] buff=new char[400];
+    String back =new String(buff);//Make a string of length 400 to house optimiser version string. This is more than enough
     try (Arena foreign = Arena.ofConfined()) {
       final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
       var versionnative = Linker.nativeLinker().downcallHandle(
@@ -221,8 +220,7 @@ public class OptimiserFunctions {
           FunctionDescriptor.of(ValueLayout.ADDRESS,
               ValueLayout.ADDRESS));
       var aa = foreign.allocateUtf8String(back);
-      var bb=aa;
-      bb = (MemorySegment) versionnative.invokeExact(aa);
+      MemorySegment bb = (MemorySegment) versionnative.invokeExact(aa);
       back = aa.getUtf8String(0);
     }
 

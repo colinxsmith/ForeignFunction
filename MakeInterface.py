@@ -24,6 +24,11 @@ else:
     print('\tsafeqp.find("%s").orElseThrow(),'%funcName)
 if returnObj=='void':print('\tFunctionDescriptor.ofVoid(')
 elif returnObj=='double' :print('\tFunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,')
+elif returnObj=='float' :print('\tFunctionDescriptor.of(ValueLayout.JAVA_FLOAT,')
+elif returnObj=='long' :print('\tFunctionDescriptor.of(ValueLayout.JAVA_LONG,')
+elif returnObj=='int' :print('\tFunctionDescriptor.of(ValueLayout.JAVA_INT,')
+elif returnObj=='byte' :print('\tFunctionDescriptor.of(ValueLayout.JAVA_BYTE,')
+elif returnObj=='byte[]' :print('\tFunctionDescriptor.of(ValueLayout.ADDRESS,')
 #print(parts)
 np=len(parts)
 ip=0
