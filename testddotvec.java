@@ -4,6 +4,7 @@ import com.bitaplus.BitaModel.Optimisation.*;
 //run with;       java  --enable-preview --enable-native-access=ALL-UNNAMED --source 21 testddotvec.java
 public class testddotvec {
     public static void main(String args[]) {
+   //     OptimiserFunctions.libraryname="/host/colin/safeqp/libsafeqp.so";
         double[] a = { 1, 2, 3, 4, 5, 6, 7 };
         double[] b = { 1, 1, 1, 1, 1, 1, 1 };
         long n = a.length;
