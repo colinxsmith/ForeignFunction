@@ -10,7 +10,7 @@ import java.lang.foreign.ValueLayout;
 
 public class OptimiserFunctions {
   public static double lm_eps = Math.abs((((double) 4) / 3 - 1) * 3 - 1); // Machine accuracy
-  public static String libraryname = "safeqp.dll";
+  public static String libraryname = "safeqp";
 
   public static double[][] Allocate2D(int n, int m) {
     double[][] y = new double[n][m];
