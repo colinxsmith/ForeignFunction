@@ -10,6 +10,7 @@ import java.lang.foreign.ValueLayout;
 
 public class OptimiserFunctions {
   public static double lm_eps = Math.abs((((double) 4) / 3 - 1) * 3 - 1); // Machine accuracy
+  public static String libraryname = "safeqp.dll";
 
   public static double[][] Allocate2D(int n, int m) {
     double[][] y = new double[n][m];
@@ -58,7 +59,7 @@ public class OptimiserFunctions {
   public static double ddotvec(long n, double[] a, double[] b) {
     double back;
     try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var ddotvecnative = Linker.nativeLinker().downcallHandle(
           safeqp.find("ddotvec").orElseThrow(),
           FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS,
@@ -81,7 +82,7 @@ public class OptimiserFunctions {
 
   public static void dsubvec(long n, double[] a, double[] b, double[] c) {
     try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var dsubvecnative = Linker.nativeLinker().downcallHandle(
           safeqp.find("dsubvec").orElseThrow(),
           FunctionDescriptor.ofVoid(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
@@ -111,7 +112,7 @@ public class OptimiserFunctions {
       double[] Q) {
 
     try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var factormodelprocessnative = Linker.nativeLinker().downcallHandle(
           safeqp.find("factor_model_process").orElseThrow(),
           FunctionDescriptor.ofVoid(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS,
@@ -145,7 +146,7 @@ public class OptimiserFunctions {
   public static void daddvec(long n, double[] a, double[] b, double[] c) {
 
     try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var daddvecnative = Linker.nativeLinker().downcallHandle(
           safeqp.find("daddvec").orElseThrow(),
           FunctionDescriptor.ofVoid(
@@ -187,7 +188,7 @@ public class OptimiserFunctions {
   public static double dsumvec(long n, double[] ss) {
     double back;
     try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var dsumvecnative = Linker.nativeLinker().downcallHandle(
           safeqp.find("dsumvec").orElseThrow(),
           FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
@@ -211,10 +212,11 @@ public class OptimiserFunctions {
   }
 
   public static String version() {
-    char[] buff=new char[400];
-    String back =new String(buff);//Make a string of length 400 to house optimiser version string. This is more than enough
+    char[] buff = new char[400];
+    String back = new String(buff);// Make a string of length 400 to house optimiser version string. This is more
+                                   // than enough
     try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var versionnative = Linker.nativeLinker().downcallHandle(
           safeqp.find("version").orElseThrow(),
           FunctionDescriptor.of(ValueLayout.ADDRESS,

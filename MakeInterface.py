@@ -15,11 +15,11 @@ parts=re.sub('^.*\(','',line)
 parts=re.sub('\).*','',parts).split(',')
 print('public static ',line,'{')
 if returnObj=='void':
-    print('\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);')
+    print('\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);')
     print('\tvar %snative = Linker.nativeLinker().downcallHandle('%(funcName))
     print('\tsafeqp.find("%s").orElseThrow(),'%funcName)
 else: 
-    print('\t',returnObj,'back;','\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup("safeqp.dll", foreign);')
+    print('\t',returnObj,'back;','\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);')
     print('\tvar %snative = Linker.nativeLinker().downcallHandle('%(funcName))
     print('\tsafeqp.find("%s").orElseThrow(),'%funcName)
 if returnObj=='void':print('\tFunctionDescriptor.ofVoid(')
