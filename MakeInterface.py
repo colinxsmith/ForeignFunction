@@ -79,7 +79,7 @@ for part in parts:
         print('\t%s[i]=%s.getAtIndex(ValueLayout.JAVA_%s, i);}'%(argname,argname+argname,jtype))
 print('}')
 if returnObj.find('void')==-1:
-    print('catch (Throwable e) {       System.out.println(e);       back = 0.0;       }')
+    print('catch (Throwable e) {       System.out.println(e);       back = 0;       }')
     print('return back;}')
 else :
     print('catch (Throwable e) {       System.out.println(e);             }}')
