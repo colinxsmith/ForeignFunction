@@ -231,4 +231,82 @@ public class OptimiserFunctions {
     }
     return back;
   }
+
+  public static String cversion() {
+    char[] buff = new char[400];
+    String back = new String(buff);// Make a string of length 400 to house optimiser version string. This is more
+                                   // than enough
+    try (Arena foreign = Arena.ofConfined()) {
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+      var versionnative = Linker.nativeLinker().downcallHandle(
+          safeqp.find("cversion").orElseThrow(),
+          FunctionDescriptor.of(ValueLayout.ADDRESS,
+              ValueLayout.ADDRESS));
+      var aa = foreign.allocateUtf8String(back);
+      MemorySegment bb = (MemorySegment) versionnative.invokeExact(aa);
+      back = aa.getUtf8String(0);
+    }
+
+    catch (Throwable e) {
+      System.out.println(e);
+    }
+    return back;
+  }
+
+  public static int pickoutstrings(long nstocks, String[] stocklist, long M_nstocks, String[] M_stocklist, String[] Q,
+      long[] Order) {
+    int back;
+    try (Arena foreign = Arena.ofConfined()) {
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+      var pickoutstringsnative = Linker.nativeLinker().downcallHandle(
+          safeqp.find("pickoutstrings").orElseThrow(),
+          FunctionDescriptor.of(ValueLayout.JAVA_INT,
+              ValueLayout.JAVA_LONG,
+              ValueLayout.ADDRESS,
+              ValueLayout.JAVA_LONG,
+              ValueLayout.ADDRESS,
+              ValueLayout.ADDRESS,
+              ValueLayout.ADDRESS));
+      var stockliststocklist = foreign.allocateArray(ValueLayout.ADDRESS, stocklist.length);
+      for (int i = 0; i < stocklist.length; i++) {
+        stockliststocklist.setUtf8String(i, stocklist[i]);
+      }
+      var M_stocklistM_stocklist = foreign.allocateArray(ValueLayout.ADDRESS, M_stocklist.length);
+      for (int i = 0; i < M_stocklist.length; i++) {
+        M_stocklistM_stocklist.setUtf8String(i, M_stocklist[i]);
+      }
+      var QQ = foreign.allocateArray(ValueLayout.ADDRESS, Q.length);
+      for (int i = 0; i < Q.length; i++) {
+        QQ.setUtf8String(i, Q[i]);
+      }
+      var OrderOrder = foreign.allocateArray(ValueLayout.JAVA_LONG, Order.length);
+      for (int i = 0; i < Order.length; i++) {
+        OrderOrder.setAtIndex(ValueLayout.JAVA_LONG, i, Order[i]);
+      }
+      back = (int) pickoutstringsnative.invokeExact(
+          nstocks,
+          stockliststocklist,
+          M_nstocks,
+          M_stocklistM_stocklist,
+          QQ,
+          OrderOrder);
+      for (int i = 0; i < stocklist.length; i++) {
+        stocklist[i] = stockliststocklist.getUtf8String(i);
+      }
+      for (int i = 0; i < M_stocklist.length; i++) {
+        M_stocklist[i] = M_stocklistM_stocklist.getUtf8String(i);
+      }
+      for (int i = 0; i < Q.length; i++) {
+        Q[i] = QQ.getUtf8String(i);
+      }
+      for (int i = 0; i < Order.length; i++) {
+        Order[i] = OrderOrder.getAtIndex(ValueLayout.JAVA_LONG, i);
+      }
+    } catch (Throwable e) {
+      System.out.println(e);
+      back = 0;
+    }
+    return back;
+  }
+
 }
