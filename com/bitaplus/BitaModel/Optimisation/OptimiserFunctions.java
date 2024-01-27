@@ -4,6 +4,7 @@ package com.bitaplus.BitaModel.Optimisation;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
@@ -269,15 +270,26 @@ public class OptimiserFunctions {
               ValueLayout.ADDRESS));
       var stockliststocklist = foreign.allocateArray(ValueLayout.ADDRESS, stocklist.length);
       for (int i = 0; i < stocklist.length; i++) {
-        stockliststocklist.setUtf8String(i, stocklist[i]);
+        MemorySegment k5=foreign.allocateUtf8String(stocklist[i]);
+        k5.setUtf8String(0,stocklist[i]);
+        stockliststocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);
+        MemorySegment k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
+        String ku=k8.getUtf8String(0);
+        assert ku==stocklist[i];
       }
+      for (int i = 0; i < stocklist.length; i++) {
+             MemorySegment k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
+             stocklist[i] = k8.getUtf8String(0);
+           }
       var M_stocklistM_stocklist = foreign.allocateArray(ValueLayout.ADDRESS, M_stocklist.length);
       for (int i = 0; i < M_stocklist.length; i++) {
-        M_stocklistM_stocklist.setUtf8String(i, M_stocklist[i]);
+        MemorySegment k5=foreign.allocateUtf8String(M_stocklist[i]);
+        M_stocklistM_stocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);
       }
       var QQ = foreign.allocateArray(ValueLayout.ADDRESS, Q.length);
       for (int i = 0; i < Q.length; i++) {
-        QQ.setUtf8String(i, Q[i]);
+        MemorySegment k5=foreign.allocateUtf8String(Q[i]);
+        QQ.setAtIndex(ValueLayout.ADDRESS, i, k5);
       }
       var OrderOrder = foreign.allocateArray(ValueLayout.JAVA_LONG, Order.length);
       for (int i = 0; i < Order.length; i++) {
@@ -290,19 +302,22 @@ public class OptimiserFunctions {
           M_stocklistM_stocklist,
           QQ,
           OrderOrder);
-      for (int i = 0; i < stocklist.length; i++) {
-        stocklist[i] = stockliststocklist.getUtf8String(i);
+ for (int i = 0; i < stocklist.length; i++) {
+        MemorySegment k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
+        stocklist[i] = k8.getUtf8String(0);
       }
       for (int i = 0; i < M_stocklist.length; i++) {
-        M_stocklist[i] = M_stocklistM_stocklist.getUtf8String(i);
+        MemorySegment k8=M_stocklistM_stocklist.getAtIndex(ValueLayout.ADDRESS, i);
+        M_stocklist[i] = k8.getUtf8String(0);
       }
       for (int i = 0; i < Q.length; i++) {
-        Q[i] = QQ.getUtf8String(i);
+        MemorySegment k8=QQ.getAtIndex(ValueLayout.ADDRESS, i);
+        Q[i] = k8.getUtf8String(0);
       }
       for (int i = 0; i < Order.length; i++) {
         Order[i] = OrderOrder.getAtIndex(ValueLayout.JAVA_LONG, i);
       }
-    } catch (Throwable e) {
+    } catch (Throwable e){
       System.out.println(e);
       back = 0;
     }
