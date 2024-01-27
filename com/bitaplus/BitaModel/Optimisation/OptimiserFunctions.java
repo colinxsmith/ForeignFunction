@@ -224,7 +224,8 @@ public class OptimiserFunctions {
               ValueLayout.ADDRESS));
       var aa = foreign.allocateUtf8String(back);
       MemorySegment bb = (MemorySegment) versionnative.invokeExact(aa);
-      back = aa.getUtf8String(0);
+      bb = bb.reinterpret(Long.MAX_VALUE);
+      back = bb.getUtf8String(0);
     }
 
     catch (Throwable e) {
@@ -245,7 +246,8 @@ public class OptimiserFunctions {
               ValueLayout.ADDRESS));
       var aa = foreign.allocateUtf8String(back);
       MemorySegment bb = (MemorySegment) versionnative.invokeExact(aa);
-      back = aa.getUtf8String(0);
+      bb = bb.reinterpret(Long.MAX_VALUE);
+      back=bb.getUtf8String(0);
     }
 
     catch (Throwable e) {
@@ -254,74 +256,60 @@ public class OptimiserFunctions {
     return back;
   }
 
-  public static int pickoutstrings(long nstocks, String[] stocklist, long M_nstocks, String[] M_stocklist, String[] Q,
-      long[] Order) {
-    int back;
-    try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-      var pickoutstringsnative = Linker.nativeLinker().downcallHandle(
-          safeqp.find("pickoutstrings").orElseThrow(),
-          FunctionDescriptor.of(ValueLayout.JAVA_INT,
-              ValueLayout.JAVA_LONG,
-              ValueLayout.ADDRESS,
-              ValueLayout.JAVA_LONG,
-              ValueLayout.ADDRESS,
-              ValueLayout.ADDRESS,
-              ValueLayout.ADDRESS));
-      var stockliststocklist = foreign.allocateArray(ValueLayout.ADDRESS, stocklist.length);
-      for (int i = 0; i < stocklist.length; i++) {
-        MemorySegment k5=foreign.allocateUtf8String(stocklist[i]);
-        k5.setUtf8String(0,stocklist[i]);
-        stockliststocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);
-        MemorySegment k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
-        String ku=k8.getUtf8String(0);
-        assert ku==stocklist[i];
-      }
-      for (int i = 0; i < stocklist.length; i++) {
-             MemorySegment k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
-             stocklist[i] = k8.getUtf8String(0);
-           }
-      var M_stocklistM_stocklist = foreign.allocateArray(ValueLayout.ADDRESS, M_stocklist.length);
-      for (int i = 0; i < M_stocklist.length; i++) {
-        MemorySegment k5=foreign.allocateUtf8String(M_stocklist[i]);
-        M_stocklistM_stocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);
-      }
-      var QQ = foreign.allocateArray(ValueLayout.ADDRESS, Q.length);
-      for (int i = 0; i < Q.length; i++) {
-        MemorySegment k5=foreign.allocateUtf8String(Q[i]);
-        QQ.setAtIndex(ValueLayout.ADDRESS, i, k5);
-      }
-      var OrderOrder = foreign.allocateArray(ValueLayout.JAVA_LONG, Order.length);
-      for (int i = 0; i < Order.length; i++) {
-        OrderOrder.setAtIndex(ValueLayout.JAVA_LONG, i, Order[i]);
-      }
-      back = (int) pickoutstringsnative.invokeExact(
-          nstocks,
-          stockliststocklist,
-          M_nstocks,
-          M_stocklistM_stocklist,
-          QQ,
-          OrderOrder);
- for (int i = 0; i < stocklist.length; i++) {
-        MemorySegment k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
-        stocklist[i] = k8.getUtf8String(0);
-      }
-      for (int i = 0; i < M_stocklist.length; i++) {
-        MemorySegment k8=M_stocklistM_stocklist.getAtIndex(ValueLayout.ADDRESS, i);
-        M_stocklist[i] = k8.getUtf8String(0);
-      }
-      for (int i = 0; i < Q.length; i++) {
-        MemorySegment k8=QQ.getAtIndex(ValueLayout.ADDRESS, i);
-        Q[i] = k8.getUtf8String(0);
-      }
-      for (int i = 0; i < Order.length; i++) {
-        Order[i] = OrderOrder.getAtIndex(ValueLayout.JAVA_LONG, i);
-      }
-    } catch (Throwable e){
-      System.out.println(e);
-      back = 0;
-    }
-    return back;
-  }
+  public static  int pickoutstrings(long nstocks, String[] stocklist, long M_nstocks, String[] M_stocklist, String[] Q, long[] Order) {
+    int back; 
+   try (Arena foreign = Arena.ofConfined()) { 
+   final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+   var pickoutstringsnative = Linker.nativeLinker().downcallHandle(
+   safeqp.find("pickoutstrings").orElseThrow(),
+   FunctionDescriptor.of(ValueLayout.JAVA_INT,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ));
+   var stockliststocklist = foreign.allocateArray(ValueLayout.ADDRESS, stocklist.length);
+   for (int i = 0; i < stocklist.length; i++) {
+     MemorySegment k5=foreign.allocateUtf8String(stocklist[i]);
+     k5.setUtf8String(0,stocklist[i]);
+     stockliststocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);}
+   var M_stocklistM_stocklist = foreign.allocateArray(ValueLayout.ADDRESS, M_stocklist.length);
+   for (int i = 0; i < M_stocklist.length; i++) {
+     MemorySegment k5=foreign.allocateUtf8String(M_stocklist[i]);
+     k5.setUtf8String(0,M_stocklist[i]);
+     M_stocklistM_stocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);}
+   var QQ = foreign.allocateArray(ValueLayout.ADDRESS, Q.length);
+   for (int i = 0; i < Q.length; i++) {
+     MemorySegment k5=foreign.allocateUtf8String(Q[i]);
+     k5.setUtf8String(0,Q[i]);
+     QQ.setAtIndex(ValueLayout.ADDRESS, i, k5);}
+   var OrderOrder = foreign.allocateArray(ValueLayout.JAVA_LONG, Order.length);
+   for (int i = 0; i < Order.length; i++) {
+     OrderOrder.setAtIndex(ValueLayout.JAVA_LONG, i, Order[i]);}
+   back = (int) pickoutstringsnative.invokeExact(
+     nstocks ,
+     stockliststocklist ,
+     M_nstocks ,
+     M_stocklistM_stocklist ,
+     QQ ,
+     OrderOrder );
+   for (int i = 0; i < stocklist.length; i++) {
+     var k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
+     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+     stocklist[i] = k8.getUtf8String(0);}
+   for (int i = 0; i < M_stocklist.length; i++) {
+     var k8=M_stocklistM_stocklist.getAtIndex(ValueLayout.ADDRESS, i);
+     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+     M_stocklist[i] = k8.getUtf8String(0);}
+   for (int i = 0; i < Q.length; i++) {
+     var k8=QQ.getAtIndex(ValueLayout.ADDRESS, i);
+     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+     Q[i] = k8.getUtf8String(0);}
+   for (int i = 0; i < Order.length; i++) {
+     Order[i]=OrderOrder.getAtIndex(ValueLayout.JAVA_LONG, i);}
+   }
+   catch (Throwable e) {       System.out.println(e);       back = 0;       }
+   return back;}
 
 }

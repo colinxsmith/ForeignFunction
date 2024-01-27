@@ -17,5 +17,5 @@ public class testpick {
     var dd=OptimiserFunctions.cversion();
     long[]order=new long[universe.length];
     int back=OptimiserFunctions.pickoutstrings(universe.length,universe,stocks.length,stocks,Q,order);
-    }
+}
 }

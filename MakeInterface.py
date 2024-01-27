@@ -2,6 +2,9 @@ import re
 from sys import argv
 #Colin 23-1-2024
 #Helper Utility to write wrapper functions using Java Foreign Function Interface from JDK 21
+#Handles arrays of strings properly after intense web search; need the reinterpret step
+#run: To make the stub for pickoutstrings (get definition from OptimiserContoller.java)
+#python Makeinterface.py "int pickoutstrings(long nstocks, String[] stocklist, long M_nstocks, String[] M_stocklist, String[] Q, long[] Order)"
 line='void daddvec(long n, double[] a, double[] b, double[] c)'
 i=0
 for arg in argv:
@@ -50,13 +53,21 @@ for part in parts:
     if argtype.find('[')>-1:
         argname=part.split(' ')[1].strip()
         jtype=re.sub('\[.*','',argtype).upper()
-        print('var %s = foreign.allocateArray(ValueLayout.JAVA_%s, %s.length);'%(argname+argname,jtype,argname))
-        print('for (int i = 0; i < %s.length; i++) {'%(argname))
-        print('\t%s.setAtIndex(ValueLayout.JAVA_%s, i, %s[i]);}'%(argname+argname,jtype,argname))
+        if jtype=='STRING':
+            print('\tvar %s = foreign.allocateArray(ValueLayout.ADDRESS, %s.length);'%(argname+argname,argname))
+        else:
+            print('\tvar %s = foreign.allocateArray(ValueLayout.JAVA_%s, %s.length);'%(argname+argname,jtype,argname))
+        print('\tfor (int i = 0; i < %s.length; i++) {'%(argname))
+        if jtype=='STRING':
+            print('\t\tMemorySegment k5=foreign.allocateUtf8String(%s[i]);'%(argname))
+            print('\t\tk5.setUtf8String(0,%s[i]);'%(argname))
+            print('\t\t%s.setAtIndex(ValueLayout.ADDRESS, i, k5);}'%(argname+argname))
+        else:
+            print('\t\t%s.setAtIndex(ValueLayout.JAVA_%s, i, %s[i]);}'%(argname+argname,jtype,argname))
     
     
-if returnObj=='void':print('%snative.invokeExact('%(funcName))
-else:print('back = (%s) %snative.invokeExact('%(returnObj,funcName))
+if returnObj=='void':print('\t%snative.invokeExact('%(funcName))
+else:print('\tback = (%s) %snative.invokeExact('%(returnObj,funcName))
 ip=0
 ending=','
 for part in parts:
@@ -64,8 +75,8 @@ for part in parts:
     part=part.strip()
     argtype=part.split(' ')[0].strip()
     argname=part.split(' ')[1].strip()
-    if argtype.find('[')>-1:print('%s'%(argname+argname)),print(ending)
-    else:print(argname,ending)
+    if argtype.find('[')>-1:print('\t\t%s %s'%(argname+argname,ending))
+    else:print('\t\t%s %s'%(  argname,ending))
     ip+=1
 
 
@@ -75,11 +86,16 @@ for part in parts:
     if argtype.find('[')>-1:
         argname=part.split(' ')[1].strip()
         jtype=re.sub('\[.*','',argtype).upper()
-        print('for (int i = 0; i < %s.length; i++) {'%(argname))
-        print('\t%s[i]=%s.getAtIndex(ValueLayout.JAVA_%s, i);}'%(argname,argname+argname,jtype))
-print('}')
+        print('\tfor (int i = 0; i < %s.length; i++) {'%(argname))
+        if jtype=='STRING':
+            print('\t\tvar k8=%s.getAtIndex(ValueLayout.ADDRESS, i);'%(argname+argname))
+            print('\t\tk8 = k8.reinterpret(Long.MAX_VALUE);// This is essential')
+            print('\t\t%s[i] = k8.getUtf8String(0);}'%argname)
+        else:
+            print('\t\t%s[i]=%s.getAtIndex(ValueLayout.JAVA_%s, i);}'%(argname,argname+argname,jtype))
+print('\t}')
 if returnObj.find('void')==-1:
-    print('catch (Throwable e) {       System.out.println(e);       back = 0;       }')
-    print('return back;}')
+    print('\tcatch (Throwable e) {       System.out.println(e);       back = 0;       }')
+    print('\treturn back;}')
 else :
-    print('catch (Throwable e) {       System.out.println(e);             }}')
+    print('\tcatch (Throwable e) {       System.out.println(e);             }}')
