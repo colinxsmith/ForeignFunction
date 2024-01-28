@@ -4,7 +4,7 @@ import com.bitaplus.BitaModel.Optimisation.*;
 //run with;       java  --enable-preview --enable-native-access=ALL-UNNAMED --source 21 testddotvec.java
 public class testddotvec {
     public static void main(String args[]) {
-        OptimiserFunctions.libraryname = "/host/colin/safeqp/libsafeqp.so";
+//        OptimiserFunctions.libraryname = "/host/colin/safeqp/libsafeqp.so";
         double[] a = { 1, 2, 3, 4, 5, 6, 7 };
         double[] b = { 1, 1, 1, 1, 1, 1, 1 };
         long n = a.length;
@@ -19,6 +19,10 @@ public class testddotvec {
         String backs = OptimiserController.version();
         String cve = OptimiserFunctions.cversion();
         System.out.println("cversion " + cve);
+        var buff=new String[1];
+        buff[0]="not empty";
+        int days=OptimiserFunctions.days_left(buff);
+        System.out.println(days+" days left. "+buff[0]);
         assert back == backs;
     }
 }

@@ -17,7 +17,9 @@ public class OptimiserFunctions {
     double[][] y = new double[n][m];
     return y;
   }
-
+  public static double[][] oneD2twoD(int n, int m, double[] ONED){
+    return oneD2twoD(n, m,  ONED,Boolean.FALSE);
+  }
   public static double[][] oneD2twoD(int n, int m, double[] ONED, Boolean transpose) {
     double[][] TWOD = (double[][]) new double[n][];
     if (transpose) {
@@ -36,6 +38,9 @@ public class OptimiserFunctions {
       }
     }
     return TWOD;
+  }
+  public static double[] twoD2oneD(int n, int nf, double[][] TWOD){
+    return twoD2oneD(n, nf, TWOD,Boolean.FALSE);
   }
 
   public static double[] twoD2oneD(int n, int nf, double[][] TWOD, Boolean transpose) {
@@ -107,43 +112,73 @@ public class OptimiserFunctions {
     } catch (Throwable e) {
       System.out.println(e);
     }
-  }
+  }public static  int days_left(String[] aversion) {
+    int back; 
+   try (Arena foreign = Arena.ofConfined()) { 
+   final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+   var days_leftnative = Linker.nativeLinker().downcallHandle(
+   safeqp.find("days_left").orElseThrow(),
+   FunctionDescriptor.of(ValueLayout.JAVA_INT,
+     ValueLayout.ADDRESS ));
+   var aversionaversion = foreign.allocateArray(ValueLayout.ADDRESS, aversion.length);
+   for (int i = 0; i < aversion.length; i++) {
+     MemorySegment k5=foreign.allocateUtf8String(aversion[i]);
+     k5.setUtf8String(0,aversion[i]);
+     aversionaversion.setAtIndex(ValueLayout.ADDRESS, i, k5);}
+   back = (int) days_leftnative.invokeExact(
+     aversionaversion );
+   for (int i = 0; i < aversion.length; i++) {
+     var k8=aversionaversion.getAtIndex(ValueLayout.ADDRESS, i);
+     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+     aversion[i] = k8.getUtf8String(0);}
+   }
+   catch (Throwable e) {       System.out.println(e);       back = 0;       }
+   return back;}
+ 
+  public static  void factor_model_process(long n, long nf, double[][] FL, double[] FC, double[] SV,double[] Q) {
 
-  public static void factor_model_process(long n, long nf, double[][] FL, double[] FC, double[] SV,
-      double[] Q) {
-
-    try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-      var factormodelprocessnative = Linker.nativeLinker().downcallHandle(
-          safeqp.find("factor_model_process").orElseThrow(),
-          FunctionDescriptor.ofVoid(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS,
-              ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
-      double[] FLOAD = twoD2oneD((int) n, (int) nf, FL, Boolean.FALSE);
-      var FL_t = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, FLOAD.length);
-      for (int i = 0; i < FLOAD.length; i++) {
-        FL_t.setAtIndex(ValueLayout.JAVA_DOUBLE, i, FLOAD[i]);
-      }
-      var FC_t = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, FC.length);
-      for (int i = 0; i < FC.length; i++) {
-        FC_t.setAtIndex(ValueLayout.JAVA_DOUBLE, i, FC[i]);
-      }
-      var SV_t = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, SV.length);
-      for (int i = 0; i < SV.length; i++) {
-        SV_t.setAtIndex(ValueLayout.JAVA_DOUBLE, i, SV[i]);
-      }
-      var Q_t = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Q.length);
-      for (int i = 0; i < Q.length; i++) {
-        Q_t.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Q[i]);
-      }
-      factormodelprocessnative.invokeExact(n, nf, FL_t, FC_t, SV_t, Q_t);
-      for (int i = 0; i < Q.length; ++i) {
-        Q[i] = Q_t.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-      }
-    } catch (Throwable e) {
-      System.out.println(e);
+    try (Arena foreign = Arena.ofConfined()) { 
+    final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+    var factor_model_processnative = Linker.nativeLinker().downcallHandle(
+    safeqp.find("factor_model_process").orElseThrow(),
+    FunctionDescriptor.ofVoid(
+      ValueLayout.JAVA_LONG ,
+      ValueLayout.JAVA_LONG ,
+      ValueLayout.ADDRESS ,
+      ValueLayout.ADDRESS ,
+      ValueLayout.ADDRESS ,
+      ValueLayout.ADDRESS ));
+    double[] FL1d = twoD2oneD((int) n, (int) nf, FL);	//Get the integer arguments correct!
+    var FL1dFL1d = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, FL1d.length);
+    for (int i = 0; i < FL1d.length; i++) {
+      FL1dFL1d.setAtIndex(ValueLayout.JAVA_DOUBLE, i, FL1d[i]);}
+    var FCFC = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, FC.length);
+    for (int i = 0; i < FC.length; i++) {
+      FCFC.setAtIndex(ValueLayout.JAVA_DOUBLE, i, FC[i]);}
+    var SVSV = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, SV.length);
+    for (int i = 0; i < SV.length; i++) {
+      SVSV.setAtIndex(ValueLayout.JAVA_DOUBLE, i, SV[i]);}
+    var QQ = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Q.length);
+    for (int i = 0; i < Q.length; i++) {
+      QQ.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Q[i]);}
+    factor_model_processnative.invokeExact(
+      n ,
+      nf ,
+      FL1dFL1d ,
+      FCFC ,
+      SVSV ,
+      QQ );
+    for (int i = 0; i < FL1d.length; i++) {
+      FL1d[i]=FL1dFL1d.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+    for (int i = 0; i < FC.length; i++) {
+      FC[i]=FCFC.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+    for (int i = 0; i < SV.length; i++) {
+      SV[i]=SVSV.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+    for (int i = 0; i < Q.length; i++) {
+      Q[i]=QQ.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
     }
-  }
-
+    catch (Throwable e) {       System.out.println(e);             }}
+   
   public static void daddvec(long n, double[] a, double[] b, double[] c) {
 
     try (Arena foreign = Arena.ofConfined()) {

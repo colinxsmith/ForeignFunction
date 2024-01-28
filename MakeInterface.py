@@ -12,6 +12,13 @@ for arg in argv:
     #print(line)
     if i==1:break
     i+=1
+allargs=[re.sub('^.* ','',part) for part in (line.split('(')[1].replace(')','')).split(',')]
+#Attempt to get the arguments correct for java's twoD2oneD, but check the final outcome
+if len(allargs)>1:
+    if allargs[1]=='m':
+        dd=allargs[0]
+        allargs[0]=allargs[1]
+        allargs[1]=dd
 returnObj=line.split(' ')[0].strip()
 funcName=re.sub('\(.*','',line.split(' ')[1]).strip()
 parts=re.sub('^.*\(','',line)
@@ -52,6 +59,9 @@ for part in parts:
     argtype=part.split(' ')[0].strip()
     if argtype.find('[')>-1:
         argname=part.split(' ')[1].strip()
+        if argtype.find('][]')>-1:
+            print('\tdouble[] %s1d = twoD2oneD((int) %s, (int) %s, %s);\t//Get the integer arguments correct!'%(argname,allargs[0],allargs[1],argname))
+            argname+='1d'
         jtype=re.sub('\[.*','',argtype).upper()
         if jtype=='STRING':
             print('\tvar %s = foreign.allocateArray(ValueLayout.ADDRESS, %s.length);'%(argname+argname,argname))
@@ -75,7 +85,10 @@ for part in parts:
     part=part.strip()
     argtype=part.split(' ')[0].strip()
     argname=part.split(' ')[1].strip()
-    if argtype.find('[')>-1:print('\t\t%s %s'%(argname+argname,ending))
+    if argtype.find('[')>-1:
+        if argtype.find('][]')>-1:
+            argname+='1d'
+        print('\t\t%s %s'%(argname+argname,ending))
     else:print('\t\t%s %s'%(  argname,ending))
     ip+=1
 
@@ -85,6 +98,8 @@ for part in parts:
     argtype=part.split(' ')[0].strip()
     if argtype.find('[')>-1:
         argname=part.split(' ')[1].strip()
+        if argtype.find('][]')>-1:
+            argname+='1d'
         jtype=re.sub('\[.*','',argtype).upper()
         print('\tfor (int i = 0; i < %s.length; i++) {'%(argname))
         if jtype=='STRING':
