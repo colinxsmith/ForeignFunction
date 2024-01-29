@@ -194,11 +194,20 @@ public class compat {
         double zetaF = 1;
         double zetaS = 1;
 
-        double[] w = new double[n];
+        double[] wJNI = new double[n];
         int[] shake = new int[n];
         double[] ogamma = new double[1];
+        short back=OptimiserController.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), wJNI, (long) m, AA, L, U,
+        alpha, bench, Q, gamma, initial, delta, buy, sell, kappa, basket, trades, revise, costs, min_hold,
+        min_trade, ls, full, rmin, rmax, round, min_lot, size_lot, shake, (long) ncomp, Composites, value,
+        (long) npiece, hpiece, pgrad, (long) nabs, Abs_A, (long) mabs, I_A, Abs_U, null, null, null,
+        minRisk, maxRisk, ogamma, mask, 2, "OptJava.log", downrisk, downfactor, longbasket, shortbasket,
+        tradebuy, tradesell, zetaS, zetaF, ShortCostScale, valuel, Abs_L);
  //       OptimiserFunctions.libraryname="C:\\Users\\colin\\COM64\\safeqp\\x64\\Debug\\safeqp.dll";
-        short back=OptimiserFunctions.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), w, (long) m, AA, L, U,
+        
+ 
+        double[] wFFI= new double[n];
+        back=OptimiserFunctions.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), wFFI, (long) m, AA, L, U,
                 alpha, bench, Q, gamma, initial, delta, buy, sell, kappa, basket, trades, revise, costs, min_hold,
                 min_trade, ls, full, rmin, rmax, round, min_lot, size_lot, shake, (long) ncomp, Composites, value,
                 (long) npiece, hpiece, pgrad, (long) nabs, Abs_A, (long) mabs, I_A, Abs_U, null, null, null,
@@ -207,6 +216,9 @@ public class compat {
 
         System.out.println(back);
         System.out.println(OptimiserFunctions.Return_Message(back));
+        double[]diff=new double[n];
+        OptimiserFunctions.dsubvec(n,wJNI,wFFI,diff);
+        assert OptimiserFunctions.ddotvec(n,diff,diff)<OptimiserFunctions.lm_eps;
         // Show how do a goal seek to find cube root of 3
         compat solvetest = new compat();
         solvetest.seek = 3;
