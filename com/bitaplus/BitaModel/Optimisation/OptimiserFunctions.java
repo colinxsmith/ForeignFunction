@@ -4,7 +4,6 @@ package com.bitaplus.BitaModel.Optimisation;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
-import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
@@ -44,7 +43,9 @@ public class OptimiserFunctions {
   }
 
   public static double[] twoD2oneD(int n, int nf, double[][] TWOD, Boolean transpose) {
-    assert n == TWOD.length;
+    if(TWOD==null){
+      return null;
+    }
     double[] ONED = new double[nf * n];
     if (transpose) {
       for (var i = 0; i < n; ++i) {
@@ -61,7 +62,22 @@ public class OptimiserFunctions {
     }
     return ONED;
   }
-
+  public static  String Return_Message(int ifail) {
+    String back; 
+   try (Arena foreign = Arena.ofConfined()) { 
+   final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+   var Return_Messagenative = Linker.nativeLinker().downcallHandle(
+   safeqp.find("Return_Message").orElseThrow(),
+   FunctionDescriptor.of(ValueLayout.ADDRESS,
+     ValueLayout.JAVA_INT ));
+   MemorySegment bbb = (MemorySegment) Return_Messagenative.invokeExact(
+     ifail );
+ bbb = bbb.reinterpret(Long.MAX_VALUE);
+ back = bbb.getUtf8String(0);
+   }
+   catch (Throwable e) {       System.out.println(e);       back = "";       }
+   return back;}
+ 
   public static double ddotvec(long n, double[] a, double[] b) {
     double back;
     try (Arena foreign = Arena.ofConfined()) {
@@ -114,6 +130,7 @@ public class OptimiserFunctions {
     }
   }public static  int days_left(String[] aversion) {
     int back; 
+    aversion[0]="q";
    try (Arena foreign = Arena.ofConfined()) { 
    final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
    var days_leftnative = Linker.nativeLinker().downcallHandle(
@@ -346,5 +363,384 @@ public class OptimiserFunctions {
    }
    catch (Throwable e) {       System.out.println(e);       back = 0;       }
    return back;}
-
+   public static  short Optimise_internalCVPAFbl(long n, int nfac, String[] stocknames, double[] w_opt, long m, double[][] AAA, double[] L, double[] U, double[] alpha, double[] benchmark, double[] QMATRIX, double gamma, double[] Initial, double delta, double[] buy, double[] sell, double kappa, int basket, int trades, int revise, int costs, double min_holding, double min_trade, int m_LS, int Fully_Invested, double Rmin, double Rmax, int m_Round, double[] min_lot, double[] size_lot, int[] shake, long ncomp, double[] Composite, double LSValue, long npiece, double[] hpiece, double[] pgrad, long nabs, double[][] Abs_A, long mabs, long[] I_A, double[] Abs_U, double[] FFC, double[][] FLOAD, double[] SSV, double minRisk, double maxRisk, double[] ogamma, double[] mask, int log, String logfile, int downrisk, double downfactor, int longbasket, int shortbasket, int tradebuy, int tradesell, double zetaS, double zetaF, double ShortCostScale, double LSValuel, double[] Abs_L) {
+    short back; 
+   try (Arena foreign = Arena.ofConfined()) { 
+   final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+   var Optimise_internalCVPAFblnative = Linker.nativeLinker().downcallHandle(
+   safeqp.find("Optimise_internalCVPAFbl").orElseThrow(),
+   FunctionDescriptor.of(ValueLayout.JAVA_SHORT,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_LONG ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.ADDRESS ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_INT ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.JAVA_DOUBLE ,
+     ValueLayout.ADDRESS ));
+ MemorySegment stocknamesstocknames;
+ if(stocknames==null){
+   stocknamesstocknames = MemorySegment.NULL;}
+ else{	stocknamesstocknames = foreign.allocateArray(ValueLayout.ADDRESS, stocknames.length);}
+ if(stocknames!=null){
+   for (int i = 0; i < stocknames.length; i++) {
+     MemorySegment k5=foreign.allocateUtf8String(stocknames[i]);
+     k5.setUtf8String(0,stocknames[i]);
+     stocknamesstocknames.setAtIndex(ValueLayout.ADDRESS, i, k5);}}
+ MemorySegment w_optw_opt;
+ if(w_opt==null){
+   w_optw_opt = MemorySegment.NULL;}
+ else{	w_optw_opt = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, w_opt.length);}
+ if(w_opt!=null){
+   for (int i = 0; i < w_opt.length; i++) {
+     w_optw_opt.setAtIndex(ValueLayout.JAVA_DOUBLE, i, w_opt[i]);}}
+   double[] AAA1d = twoD2oneD((int) m, (int) n, AAA);	//Get the integer arguments correct!
+ MemorySegment AAA1dAAA1d;
+ if(AAA1d==null){
+   AAA1dAAA1d = MemorySegment.NULL;}
+ else{	AAA1dAAA1d = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, AAA1d.length);}
+ if(AAA1d!=null){
+   for (int i = 0; i < AAA1d.length; i++) {
+     AAA1dAAA1d.setAtIndex(ValueLayout.JAVA_DOUBLE, i, AAA1d[i]);}}
+ MemorySegment LL;
+ if(L==null){
+   LL = MemorySegment.NULL;}
+ else{	LL = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, L.length);}
+ if(L!=null){
+   for (int i = 0; i < L.length; i++) {
+     LL.setAtIndex(ValueLayout.JAVA_DOUBLE, i, L[i]);}}
+ MemorySegment UU;
+ if(U==null){
+   UU = MemorySegment.NULL;}
+ else{	UU = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, U.length);}
+ if(U!=null){
+   for (int i = 0; i < U.length; i++) {
+     UU.setAtIndex(ValueLayout.JAVA_DOUBLE, i, U[i]);}}
+ MemorySegment alphaalpha;
+ if(alpha==null){
+   alphaalpha = MemorySegment.NULL;}
+ else{	alphaalpha = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, alpha.length);}
+ if(alpha!=null){
+   for (int i = 0; i < alpha.length; i++) {
+     alphaalpha.setAtIndex(ValueLayout.JAVA_DOUBLE, i, alpha[i]);}}
+ MemorySegment benchmarkbenchmark;
+ if(benchmark==null){
+   benchmarkbenchmark = MemorySegment.NULL;}
+ else{	benchmarkbenchmark = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, benchmark.length);}
+ if(benchmark!=null){
+   for (int i = 0; i < benchmark.length; i++) {
+     benchmarkbenchmark.setAtIndex(ValueLayout.JAVA_DOUBLE, i, benchmark[i]);}}
+ MemorySegment QMATRIXQMATRIX;
+ if(QMATRIX==null){
+   QMATRIXQMATRIX = MemorySegment.NULL;}
+ else{	QMATRIXQMATRIX = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, QMATRIX.length);}
+ if(QMATRIX!=null){
+   for (int i = 0; i < QMATRIX.length; i++) {
+     QMATRIXQMATRIX.setAtIndex(ValueLayout.JAVA_DOUBLE, i, QMATRIX[i]);}}
+ MemorySegment InitialInitial;
+ if(Initial==null){
+   InitialInitial = MemorySegment.NULL;}
+ else{	InitialInitial = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Initial.length);}
+ if(Initial!=null){
+   for (int i = 0; i < Initial.length; i++) {
+     InitialInitial.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Initial[i]);}}
+ MemorySegment buybuy;
+ if(buy==null){
+   buybuy = MemorySegment.NULL;}
+ else{	buybuy = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, buy.length);}
+ if(buy!=null){
+   for (int i = 0; i < buy.length; i++) {
+     buybuy.setAtIndex(ValueLayout.JAVA_DOUBLE, i, buy[i]);}}
+ MemorySegment sellsell;
+ if(sell==null){
+   sellsell = MemorySegment.NULL;}
+ else{	sellsell = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, sell.length);}
+ if(sell!=null){
+   for (int i = 0; i < sell.length; i++) {
+     sellsell.setAtIndex(ValueLayout.JAVA_DOUBLE, i, sell[i]);}}
+ MemorySegment min_lotmin_lot;
+ if(min_lot==null){
+   min_lotmin_lot = MemorySegment.NULL;}
+ else{	min_lotmin_lot = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, min_lot.length);}
+ if(min_lot!=null){
+   for (int i = 0; i < min_lot.length; i++) {
+     min_lotmin_lot.setAtIndex(ValueLayout.JAVA_DOUBLE, i, min_lot[i]);}}
+ MemorySegment size_lotsize_lot;
+ if(size_lot==null){
+   size_lotsize_lot = MemorySegment.NULL;}
+ else{	size_lotsize_lot = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, size_lot.length);}
+ if(size_lot!=null){
+   for (int i = 0; i < size_lot.length; i++) {
+     size_lotsize_lot.setAtIndex(ValueLayout.JAVA_DOUBLE, i, size_lot[i]);}}
+ MemorySegment shakeshake;
+ if(shake==null){
+   shakeshake = MemorySegment.NULL;}
+ else{	shakeshake = foreign.allocateArray(ValueLayout.JAVA_INT, shake.length);}
+ if(shake!=null){
+   for (int i = 0; i < shake.length; i++) {
+     shakeshake.setAtIndex(ValueLayout.JAVA_INT, i, shake[i]);}}
+ MemorySegment CompositeComposite;
+ if(Composite==null){
+   CompositeComposite = MemorySegment.NULL;}
+ else{	CompositeComposite = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Composite.length);}
+ if(Composite!=null){
+   for (int i = 0; i < Composite.length; i++) {
+     CompositeComposite.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Composite[i]);}}
+ MemorySegment hpiecehpiece;
+ if(hpiece==null){
+   hpiecehpiece = MemorySegment.NULL;}
+ else{	hpiecehpiece = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, hpiece.length);}
+ if(hpiece!=null){
+   for (int i = 0; i < hpiece.length; i++) {
+     hpiecehpiece.setAtIndex(ValueLayout.JAVA_DOUBLE, i, hpiece[i]);}}
+ MemorySegment pgradpgrad;
+ if(pgrad==null){
+   pgradpgrad = MemorySegment.NULL;}
+ else{	pgradpgrad = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, pgrad.length);}
+ if(pgrad!=null){
+   for (int i = 0; i < pgrad.length; i++) {
+     pgradpgrad.setAtIndex(ValueLayout.JAVA_DOUBLE, i, pgrad[i]);}}
+   double[] Abs_A1d = twoD2oneD((int) nabs, (int) n, Abs_A);	//Get the integer arguments correct!
+ MemorySegment Abs_A1dAbs_A1d;
+ if(Abs_A1d==null){
+   Abs_A1dAbs_A1d = MemorySegment.NULL;}
+ else{	Abs_A1dAbs_A1d = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Abs_A1d.length);}
+ if(Abs_A1d!=null){
+   for (int i = 0; i < Abs_A1d.length; i++) {
+     Abs_A1dAbs_A1d.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Abs_A1d[i]);}}
+ MemorySegment I_AI_A;
+ if(I_A==null){
+   I_AI_A = MemorySegment.NULL;}
+ else{	I_AI_A = foreign.allocateArray(ValueLayout.JAVA_LONG, I_A.length);}
+ if(I_A!=null){
+   for (int i = 0; i < I_A.length; i++) {
+     I_AI_A.setAtIndex(ValueLayout.JAVA_LONG, i, I_A[i]);}}
+ MemorySegment Abs_UAbs_U;
+ if(Abs_U==null){
+   Abs_UAbs_U = MemorySegment.NULL;}
+ else{	Abs_UAbs_U = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Abs_U.length);}
+ if(Abs_U!=null){
+   for (int i = 0; i < Abs_U.length; i++) {
+     Abs_UAbs_U.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Abs_U[i]);}}
+ MemorySegment FFCFFC;
+ if(FFC==null){
+   FFCFFC = MemorySegment.NULL;}
+ else{	FFCFFC = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, FFC.length);}
+ if(FFC!=null){
+   for (int i = 0; i < FFC.length; i++) {
+     FFCFFC.setAtIndex(ValueLayout.JAVA_DOUBLE, i, FFC[i]);}}
+   double[] FLOAD1d = twoD2oneD((int) n, (int) nfac, FLOAD);	//Get the integer arguments correct!
+ MemorySegment FLOAD1dFLOAD1d;
+ if(FLOAD1d==null){
+   FLOAD1dFLOAD1d = MemorySegment.NULL;}
+ else{	FLOAD1dFLOAD1d = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, FLOAD1d.length);}
+ if(FLOAD1d!=null){
+   for (int i = 0; i < FLOAD1d.length; i++) {
+     FLOAD1dFLOAD1d.setAtIndex(ValueLayout.JAVA_DOUBLE, i, FLOAD1d[i]);}}
+ MemorySegment SSVSSV;
+ if(SSV==null){
+   SSVSSV = MemorySegment.NULL;}
+ else{	SSVSSV = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, SSV.length);}
+ if(SSV!=null){
+   for (int i = 0; i < SSV.length; i++) {
+     SSVSSV.setAtIndex(ValueLayout.JAVA_DOUBLE, i, SSV[i]);}}
+ MemorySegment ogammaogamma;
+ if(ogamma==null){
+   ogammaogamma = MemorySegment.NULL;}
+ else{	ogammaogamma = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, ogamma.length);}
+ if(ogamma!=null){
+   for (int i = 0; i < ogamma.length; i++) {
+     ogammaogamma.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ogamma[i]);}}
+ MemorySegment maskmask;
+ if(mask==null){
+   maskmask = MemorySegment.NULL;}
+ else{	maskmask = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, mask.length);}
+ if(mask!=null){
+   for (int i = 0; i < mask.length; i++) {
+     maskmask.setAtIndex(ValueLayout.JAVA_DOUBLE, i, mask[i]);}}
+ var logfilelogfile = foreign.allocateUtf8String(logfile);
+ logfilelogfile.setUtf8String(0,logfile);
+ MemorySegment Abs_LAbs_L;
+ if(Abs_L==null){
+   Abs_LAbs_L = MemorySegment.NULL;}
+ else{	Abs_LAbs_L = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, Abs_L.length);}
+ if(Abs_L!=null){
+   for (int i = 0; i < Abs_L.length; i++) {
+     Abs_LAbs_L.setAtIndex(ValueLayout.JAVA_DOUBLE, i, Abs_L[i]);}}
+   back = (short) Optimise_internalCVPAFblnative.invokeExact(
+     n ,
+     nfac ,
+     stocknamesstocknames ,
+     w_optw_opt ,
+     m ,
+     AAA1dAAA1d ,
+     LL ,
+     UU ,
+     alphaalpha ,
+     benchmarkbenchmark ,
+     QMATRIXQMATRIX ,
+     gamma ,
+     InitialInitial ,
+     delta ,
+     buybuy ,
+     sellsell ,
+     kappa ,
+     basket ,
+     trades ,
+     revise ,
+     costs ,
+     min_holding ,
+     min_trade ,
+     m_LS ,
+     Fully_Invested ,
+     Rmin ,
+     Rmax ,
+     m_Round ,
+     min_lotmin_lot ,
+     size_lotsize_lot ,
+     shakeshake ,
+     ncomp ,
+     CompositeComposite ,
+     LSValue ,
+     npiece ,
+     hpiecehpiece ,
+     pgradpgrad ,
+     nabs ,
+     Abs_A1dAbs_A1d ,
+     mabs ,
+     I_AI_A ,
+     Abs_UAbs_U ,
+     FFCFFC ,
+     FLOAD1dFLOAD1d ,
+     SSVSSV ,
+     minRisk ,
+     maxRisk ,
+     ogammaogamma ,
+     maskmask ,
+     log ,
+     logfilelogfile ,
+     downrisk ,
+     downfactor ,
+     longbasket ,
+     shortbasket ,
+     tradebuy ,
+     tradesell ,
+     zetaS ,
+     zetaF ,
+     ShortCostScale ,
+     LSValuel ,
+     Abs_LAbs_L );
+   if(stocknames!=null) for (int i = 0; i < stocknames.length; i++) {
+     var k8=stocknamesstocknames.getAtIndex(ValueLayout.ADDRESS, i);
+     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+     stocknames[i] = k8.getUtf8String(0);}
+   if(w_opt!=null) for (int i = 0; i < w_opt.length; i++) {
+     w_opt[i]=w_optw_opt.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(AAA1d!=null) for (int i = 0; i < AAA1d.length; i++) {
+     AAA1d[i]=AAA1dAAA1d.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(L!=null) for (int i = 0; i < L.length; i++) {
+     L[i]=LL.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(U!=null) for (int i = 0; i < U.length; i++) {
+     U[i]=UU.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(alpha!=null) for (int i = 0; i < alpha.length; i++) {
+     alpha[i]=alphaalpha.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(benchmark!=null) for (int i = 0; i < benchmark.length; i++) {
+     benchmark[i]=benchmarkbenchmark.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(QMATRIX!=null) for (int i = 0; i < QMATRIX.length; i++) {
+     QMATRIX[i]=QMATRIXQMATRIX.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(Initial!=null) for (int i = 0; i < Initial.length; i++) {
+     Initial[i]=InitialInitial.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(buy!=null) for (int i = 0; i < buy.length; i++) {
+     buy[i]=buybuy.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(sell!=null) for (int i = 0; i < sell.length; i++) {
+     sell[i]=sellsell.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(min_lot!=null) for (int i = 0; i < min_lot.length; i++) {
+     min_lot[i]=min_lotmin_lot.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(size_lot!=null) for (int i = 0; i < size_lot.length; i++) {
+     size_lot[i]=size_lotsize_lot.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(shake!=null) for (int i = 0; i < shake.length; i++) {
+     shake[i]=shakeshake.getAtIndex(ValueLayout.JAVA_INT, i);}
+   if(Composite!=null) for (int i = 0; i < Composite.length; i++) {
+     Composite[i]=CompositeComposite.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(hpiece!=null) for (int i = 0; i < hpiece.length; i++) {
+     hpiece[i]=hpiecehpiece.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(pgrad!=null) for (int i = 0; i < pgrad.length; i++) {
+     pgrad[i]=pgradpgrad.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(Abs_A1d!=null) for (int i = 0; i < Abs_A1d.length; i++) {
+     Abs_A1d[i]=Abs_A1dAbs_A1d.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(I_A!=null) for (int i = 0; i < I_A.length; i++) {
+     I_A[i]=I_AI_A.getAtIndex(ValueLayout.JAVA_LONG, i);}
+   if(Abs_U!=null) for (int i = 0; i < Abs_U.length; i++) {
+     Abs_U[i]=Abs_UAbs_U.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(FFC!=null) for (int i = 0; i < FFC.length; i++) {
+     FFC[i]=FFCFFC.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(FLOAD1d!=null) for (int i = 0; i < FLOAD1d.length; i++) {
+     FLOAD1d[i]=FLOAD1dFLOAD1d.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(SSV!=null) for (int i = 0; i < SSV.length; i++) {
+     SSV[i]=SSVSSV.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(ogamma!=null) for (int i = 0; i < ogamma.length; i++) {
+     ogamma[i]=ogammaogamma.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   if(mask!=null) for (int i = 0; i < mask.length; i++) {
+     mask[i]=maskmask.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+ logfile=logfilelogfile.getUtf8String(0);
+   if(Abs_L!=null) for (int i = 0; i < Abs_L.length; i++) {
+     Abs_L[i]=Abs_LAbs_L.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+   }
+   catch (Throwable e) {       System.out.println(e);       back = 0;       }
+   return back;}
+ 
 }

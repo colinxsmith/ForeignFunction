@@ -3,7 +3,7 @@ import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import com.bitaplus.BitaModel.Optimisation.OptimiserController;
+import com.bitaplus.BitaModel.Optimisation.*;
 
 public class compat {
     double seek;
@@ -197,13 +197,16 @@ public class compat {
         double[] w = new double[n];
         int[] shake = new int[n];
         double[] ogamma = new double[1];
-        OptimiserController.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), w, (long) m, AA, L, U,
+ //       OptimiserFunctions.libraryname="C:\\Users\\colin\\COM64\\safeqp\\x64\\Debug\\safeqp.dll";
+        short back=OptimiserFunctions.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), w, (long) m, AA, L, U,
                 alpha, bench, Q, gamma, initial, delta, buy, sell, kappa, basket, trades, revise, costs, min_hold,
                 min_trade, ls, full, rmin, rmax, round, min_lot, size_lot, shake, (long) ncomp, Composites, value,
                 (long) npiece, hpiece, pgrad, (long) nabs, Abs_A, (long) mabs, I_A, Abs_U, null, null, null,
                 minRisk, maxRisk, ogamma, mask, 2, "OptJava.log", downrisk, downfactor, longbasket, shortbasket,
                 tradebuy, tradesell, zetaS, zetaF, ShortCostScale, valuel, Abs_L);
 
+        System.out.println(back);
+        System.out.println(OptimiserFunctions.Return_Message(back));
         // Show how do a goal seek to find cube root of 3
         compat solvetest = new compat();
         solvetest.seek = 3;

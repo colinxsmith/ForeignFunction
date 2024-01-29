@@ -20,7 +20,6 @@ public class testddotvec {
         String cve = OptimiserFunctions.cversion();
         System.out.println("cversion " + cve);
         var buff=new String[1];
-        buff[0]="not empty";
         int days=OptimiserFunctions.days_left(buff);
         System.out.println(days+" days left. "+buff[0]);
         assert back == backs;
