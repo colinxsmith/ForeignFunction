@@ -47,6 +47,7 @@ for part in parts:
     if argtype.find('[')>-1:argtype='address'
     if argtype=='double':print('\t\tValueLayout.JAVA_DOUBLE',ending)
     elif argtype=='long':print('\t\tValueLayout.JAVA_LONG',ending)
+    elif argtype=='Object':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='String':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='int':print('\t\tValueLayout.JAVA_INT',ending)
     elif argtype=='address':print('\t\tValueLayout.ADDRESS',ending)
