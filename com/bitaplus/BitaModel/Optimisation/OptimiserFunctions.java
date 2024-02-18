@@ -7,6 +7,9 @@ import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 public class OptimiserFunctions {
   public static double lm_eps = Math.abs((((double) 4) / 3 - 1) * 3 - 1); // Machine accuracy
@@ -743,4 +746,55 @@ public class OptimiserFunctions {
    catch (Throwable e) {       System.out.println(e);       back = 0;       }
    return back;}
  
+ public static double TestInvoke(Object passer) {
+   double back = -123;
+   double r3=1.4422495703074083;
+   MethodType mt;
+   MethodHandle mh;
+   MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+   mt = MethodType.methodType(double.class, double.class, Object.class);
+   try {
+     mh = lookup.findStatic(passer.getClass(), "passer", mt);
+     back = (double) mh.invokeExact(r3, passer);
+   } catch (Throwable d) {
+     System.out.println(d);
+   }
+   return back;
+ }
+ 
+ public static double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
+   double back;
+   MethodType mt;
+   MethodHandle mh;
+   MemorySegment ms;
+   MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+   FunctionDescriptor oned;
+   mt = MethodType.methodType(double.class, double.class);
+
+   try (Arena foreign = Arena.ofConfined()) {
+     mh = lookup.findStatic(RiskE.getClass(), "tester", mt);
+     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,ValueLayout.JAVA_DOUBLE);
+     ms = Linker.nativeLinker().upcallStub(mh, oned,foreign);
+
+     final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+     var Solve1Dnative = Linker.nativeLinker().downcallHandle(
+         safeqp.find("Solve1D").orElseThrow(),
+         FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+             ValueLayout.ADDRESS,
+             ValueLayout.JAVA_DOUBLE,
+             ValueLayout.JAVA_DOUBLE,
+             ValueLayout.JAVA_DOUBLE,
+             ValueLayout.ADDRESS));
+     back = (double) Solve1Dnative.invokeExact(
+         ms,
+         gammabot,
+         gammatop,
+         tol,RiskE);
+   } catch (Throwable e) {
+     System.out.println(e);
+     back = 0;
+   }
+   return back;
+ }
+
 }
