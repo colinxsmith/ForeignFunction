@@ -1,10 +1,14 @@
 
 package com.bitaplus.BitaModel.Optimisation;
 
+import java.lang.foreign.AddressLayout;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SequenceLayout;
+import java.lang.foreign.StructLayout;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
@@ -752,10 +756,12 @@ public class OptimiserFunctions {
    MethodType mt;
    MethodHandle mh;
    MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-   mt = MethodType.methodType(double.class, double.class, Object.class);
+   mt = MethodType.methodType(double.class, double.class,Object.class);
    try {
      mh = lookup.findStatic(passer.getClass(), "passer", mt);
      back = (double) mh.invokeExact(r3, passer);
+     mh=lookup.findStatic(passer.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
+     back=(double)mh.invokeExact(passer);
    } catch (Throwable d) {
      System.out.println(d);
    }
@@ -769,11 +775,17 @@ public class OptimiserFunctions {
    MemorySegment ms;
    MethodHandles.Lookup lookup = MethodHandles.publicLookup();
    FunctionDescriptor oned;
-   mt = MethodType.methodType(double.class, double.class);
+   var RiskEdef = MemoryLayout.sequenceLayout(1,
+       MemoryLayout.structLayout(
+           ValueLayout.JAVA_DOUBLE.withName("seek")).withName("compat"));
+   mt = MethodType.methodType(double.class, double.class, double.class);
 
+    
    try (Arena foreign = Arena.ofConfined()) {
+    mh=lookup.findStatic(RiskE.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
+    var seek=(double)mh.invokeExact(RiskE);
      mh = lookup.findStatic(RiskE.getClass(), "tester", mt);
-     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,ValueLayout.JAVA_DOUBLE);
+     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE);
      ms = Linker.nativeLinker().upcallStub(mh, oned,foreign);
 
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
@@ -784,12 +796,12 @@ public class OptimiserFunctions {
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
-             ValueLayout.ADDRESS));
-     back = (double) Solve1Dnative.invokeExact(
+             ValueLayout.JAVA_DOUBLE));
+     back = (double) Solve1Dnative.invoke(
          ms,
          gammabot,
          gammatop,
-         tol,RiskE);
+         tol,seek);
    } catch (Throwable e) {
      System.out.println(e);
      back = 0;
