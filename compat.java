@@ -10,8 +10,8 @@ public class compat {
     public static double getseek(Object ppp){
         return ((compat)ppp).seek;
     }
-    public static double tester(double aa,double seek){
-        return aa*aa*aa-seek;
+    public static double tester(double aa,double[] seeks){
+        return aa*aa*aa-seeks[0];
     }
     public static double passer(double aa,Object passer){
         return ((compat)passer).f1d(aa);
@@ -212,7 +212,7 @@ public class compat {
         minRisk, maxRisk, ogamma, mask, 2, "OptJava.log", downrisk, downfactor, longbasket, shortbasket,
         tradebuy, tradesell, zetaS, zetaF, ShortCostScale, valuel, Abs_L);
  //       OptimiserFunctions.libraryname="C:\\Users\\colin\\COM64\\safeqp\\x64\\Debug\\safeqp.dll";
- //      OptimiserFunctions.libraryname="/home/colin/safeqp/libsafeqp.so";
+      OptimiserFunctions.libraryname="/home/colin/safeqp/libsafeqp.so";
         double[] wFFI= new double[n];
         back=OptimiserFunctions.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), wFFI, (long) m, AA, L, U,
                 alpha, bench, Q, gamma, initial, delta, buy, sell, kappa, basket, trades, revise, costs, min_hold,

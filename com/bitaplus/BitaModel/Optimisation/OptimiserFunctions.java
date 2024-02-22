@@ -778,17 +778,19 @@ public class OptimiserFunctions {
    var RiskEdef = MemoryLayout.sequenceLayout(1,
        MemoryLayout.structLayout(
            ValueLayout.JAVA_DOUBLE.withName("seek")).withName("compat"));
-   mt = MethodType.methodType(double.class, double.class, double.class);
+   mt = MethodType.methodType(double.class, double.class, double[].class);
 
     
    try (Arena foreign = Arena.ofConfined()) {
     mh=lookup.findStatic(RiskE.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
     var seek=(double)mh.invokeExact(RiskE);
      mh = lookup.findStatic(RiskE.getClass(), "tester", mt);
-     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE);
+     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE));
      ms = Linker.nativeLinker().upcallStub(mh, oned,foreign);
 
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+     var seeker=new double[1];
+     seeker[0]=seek;
      var Solve1Dnative = Linker.nativeLinker().downcallHandle(
          safeqp.find("Solve1D").orElseThrow(),
          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
@@ -796,12 +798,12 @@ public class OptimiserFunctions {
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
-             ValueLayout.JAVA_DOUBLE));
+             ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE)));
      back = (double) Solve1Dnative.invoke(
          ms,
          gammabot,
          gammatop,
-         tol,seek);
+         tol,seeker);
    } catch (Throwable e) {
      System.out.println(e);
      back = 0;
