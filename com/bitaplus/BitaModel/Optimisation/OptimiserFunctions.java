@@ -769,28 +769,40 @@ public class OptimiserFunctions {
  }
  
  public static double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
+
    double back;
+   MemorySegment RiskMem=Arena.global().allocate(8);
    MethodType mt;
    MethodHandle mh;
    MemorySegment ms;
    MethodHandles.Lookup lookup = MethodHandles.publicLookup();
    FunctionDescriptor oned;
-   var RiskEdef = MemoryLayout.sequenceLayout(1,
-       MemoryLayout.structLayout(
-           ValueLayout.JAVA_DOUBLE.withName("seek")).withName("compat"));
-   mt = MethodType.methodType(double.class, double.class, double[].class);
+   class Info {
+     static double passerFunc(double a, MemorySegment passer) {
+      Object kk=(Object)passer.asByteBuffer();
+       double back;
+       MethodType mt;
+       mt = MethodType.methodType(double.class, double.class, Object.class);
+       MethodHandle mh;
+       try {
+         mh = MethodHandles.publicLookup().findStatic(kk.getClass(), "passer", mt);
+         back = (double) mh.invokeExact(a, kk);
+       } catch (Throwable j) {
+         System.out.println(j);
+         back = 0;
+       }
+       return back;
+     }
+   }
 
-    
    try (Arena foreign = Arena.ofConfined()) {
-    mh=lookup.findStatic(RiskE.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
-    var seek=(double)mh.invokeExact(RiskE);
-     mh = lookup.findStatic(RiskE.getClass(), "tester", mt);
-     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE));
-     ms = Linker.nativeLinker().upcallStub(mh, oned,foreign);
+     mt = MethodType.methodType(double.class,double.class,MemorySegment.class);
+     mh = MethodHandles.lookup().findStatic(Info.class, "passerFunc", mt);
+     oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
+         ValueLayout.ADDRESS);
 
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-     var seeker=new double[1];
-     seeker[0]=seek;
+     ms = Linker.nativeLinker().upcallStub(mh, oned, foreign);
      var Solve1Dnative = Linker.nativeLinker().downcallHandle(
          safeqp.find("Solve1D").orElseThrow(),
          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
@@ -798,12 +810,12 @@ public class OptimiserFunctions {
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
-             ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_DOUBLE)));
+             ValueLayout.ADDRESS));
      back = (double) Solve1Dnative.invoke(
          ms,
          gammabot,
          gammatop,
-         tol,seeker);
+         tol, RiskMem);
    } catch (Throwable e) {
      System.out.println(e);
      back = 0;
