@@ -781,26 +781,28 @@ public class OptimiserFunctions {
    MemorySegment ms;
    FunctionDescriptor oned;
    class Info {
+     static double risk(double a) {
+       return a * a * a;
+     }
+
+     static double f1d(double as, double seek) {
+       return risk(as) - seek;
+     }
+
      static double passerFunc(double a, MemorySegment passer) {
-       var kk = new double[1];
-       kk[0] = passer.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
+       passer = passer.reinterpret(8);
+       var kk = passer.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
        double back;
-       MethodType mt;
-       mt = MethodType.methodType(double.class, double.class, double[].class);
-       MethodHandle mh;
-       try {
-         mh = MethodHandles.publicLookup().findStatic(kk.getClass(), "tester", mt);
-         back = (double) mh.invokeExact(a, kk);
-       } catch (Throwable j) {
-         System.out.println(j);
-         back = 0;
-       }
+       back = f1d(a, kk);
        return back;
      }
    }
 
    try (Arena foreign = Arena.ofConfined()) {
-     var risk = (double[]) RiskE;
+     mh = MethodHandles.publicLookup().findStatic(RiskE.getClass(), "getseek",
+         MethodType.methodType(double.class, Object.class));
+     var risk = new double[1];
+     risk[0] = (double) mh.invokeExact(RiskE);
      var RiskERiskE = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, risk.length);
      RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk[0]);
      var checker = RiskERiskE.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
