@@ -11,6 +11,7 @@ import java.lang.foreign.SequenceLayout;
 import java.lang.foreign.StructLayout;
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
+import java.lang.foreign.ValueLayout.OfDouble;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -753,6 +754,8 @@ public class OptimiserFunctions {
  public static double TestInvoke(Object passer) {
    double back = -123;
    double r3=1.4422495703074083;
+   double []seeker=new double[1];
+   seeker[0]=3;
    MethodType mt;
    MethodHandle mh;
    MethodHandles.Lookup lookup = MethodHandles.publicLookup();
@@ -760,6 +763,8 @@ public class OptimiserFunctions {
    try {
      mh = lookup.findStatic(passer.getClass(), "passer", mt);
      back = (double) mh.invokeExact(r3, passer);
+     mh=lookup.findStatic(passer.getClass(),"tester", MethodType.methodType(double.class,double.class,double[].class));
+     back=(double)mh.invokeExact(r3,seeker);
      mh=lookup.findStatic(passer.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
      back=(double)mh.invokeExact(passer);
    } catch (Throwable d) {
@@ -767,28 +772,46 @@ public class OptimiserFunctions {
    }
    return back;
  }
- 
+
  public static double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
+
    double back;
    MethodType mt;
    MethodHandle mh;
    MemorySegment ms;
-   MethodHandles.Lookup lookup = MethodHandles.publicLookup();
    FunctionDescriptor oned;
-   var RiskEdef = MemoryLayout.sequenceLayout(1,
-       MemoryLayout.structLayout(
-           ValueLayout.JAVA_DOUBLE.withName("seek")).withName("compat"));
-   mt = MethodType.methodType(double.class, double.class, double.class);
+   class Info {
+     static double passerFunc(double a, MemorySegment passer) {
+       var kk = new double[1];
+       kk[0] = passer.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
+       double back;
+       MethodType mt;
+       mt = MethodType.methodType(double.class, double.class, double[].class);
+       MethodHandle mh;
+       try {
+         mh = MethodHandles.publicLookup().findStatic(kk.getClass(), "tester", mt);
+         back = (double) mh.invokeExact(a, kk);
+       } catch (Throwable j) {
+         System.out.println(j);
+         back = 0;
+       }
+       return back;
+     }
+   }
 
-    
    try (Arena foreign = Arena.ofConfined()) {
-    mh=lookup.findStatic(RiskE.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
-    var seek=(double)mh.invokeExact(RiskE);
-     mh = lookup.findStatic(RiskE.getClass(), "tester", mt);
-     oned=FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE);
-     ms = Linker.nativeLinker().upcallStub(mh, oned,foreign);
+     var risk = (double[]) RiskE;
+     var RiskERiskE = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, risk.length);
+     RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk[0]);
+     var checker = RiskERiskE.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
+     assert checker == risk[0];
+     mt = MethodType.methodType(double.class, double.class, MemorySegment.class);
+     mh = MethodHandles.lookup().findStatic(Info.class, "passerFunc", mt);
+     oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
+         ValueLayout.ADDRESS);
 
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+     ms = Linker.nativeLinker().upcallStub(mh, oned, foreign);
      var Solve1Dnative = Linker.nativeLinker().downcallHandle(
          safeqp.find("Solve1D").orElseThrow(),
          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
@@ -796,12 +819,13 @@ public class OptimiserFunctions {
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
              ValueLayout.JAVA_DOUBLE,
-             ValueLayout.JAVA_DOUBLE));
-     back = (double) Solve1Dnative.invoke(
+             ValueLayout.ADDRESS));
+     back = (double) Solve1Dnative.invokeExact(
          ms,
          gammabot,
          gammatop,
-         tol,seek);
+         tol,
+         RiskERiskE);
    } catch (Throwable e) {
      System.out.println(e);
      back = 0;
