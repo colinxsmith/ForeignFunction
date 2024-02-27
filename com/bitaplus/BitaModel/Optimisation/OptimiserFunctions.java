@@ -1,20 +1,19 @@
 
 package com.bitaplus.BitaModel.Optimisation;
 
-import java.lang.foreign.AddressLayout;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
-import java.lang.foreign.MemoryLayout;
+
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SequenceLayout;
-import java.lang.foreign.StructLayout;
+
 import java.lang.foreign.SymbolLookup;
 import java.lang.foreign.ValueLayout;
-import java.lang.foreign.ValueLayout.OfDouble;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+
 
 public class OptimiserFunctions {
   public static double lm_eps = Math.abs((((double) 4) / 3 - 1) * 3 - 1); // Machine accuracy
@@ -776,10 +775,11 @@ public class OptimiserFunctions {
  public static double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
 
    double back;
-   MethodType mt;
-   MethodHandle mh;
-   MemorySegment ms;
+   MethodHandle passmh = null;
+   MethodHandle mh = null;
+   MemorySegment ms = null;
    FunctionDescriptor oned;
+   MethodHandles.Lookup lookup = MethodHandles.lookup();
    class Info {
      static double risk(double a) {
        return a * a * a;
@@ -789,31 +789,56 @@ public class OptimiserFunctions {
        return risk(as) - seek;
      }
 
+     static double f1df1d(double as, Object passer) {
+       double back = -1;
+       MethodHandle mh = null;
+       MethodHandles.Lookup lookup = MethodHandles.lookup();
+       try {
+         mh = lookup.findStatic(passer.getClass(), "passer",
+             MethodType.methodType(double.class, double.class, Object.class));
+         back = (double) mh.invokeExact(as, passer);
+       } catch (Throwable u) {
+         System.out.println(u);
+       }
+       return back;
+     }
+
      static double passerFunc(double a, MemorySegment passer) {
        passer = passer.reinterpret(8);
        var kk = passer.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
-       double back;
-       back = f1d(a, kk);
+       var back = f1d(a, kk);
        return back;
      }
    }
+   try {
+     Info kkf = new Info();
+     mh = lookup.findStatic(kkf.getClass(), "f1df1d",
+         MethodType.methodType(double.class, double.class, Object.class));
+     var testf1d = (double) mh.invokeExact(1.5, RiskE);
+     assert testf1d == 0.375;
+     mh = lookup.findStatic(Info.class, "passerFunc",
+         MethodType.methodType(double.class, double.class, MemorySegment.class));
 
+     oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
+         ValueLayout.ADDRESS);
+     ms = Linker.nativeLinker().upcallStub(mh, oned, Arena.ofAuto());
+     passmh = lookup.findStatic(RiskE.getClass(), "passer",
+         MethodType.methodType(double.class, double.class, Object.class));
+   } catch (Throwable u) {
+     System.out.println(u);
+   }
    try (Arena foreign = Arena.ofConfined()) {
      mh = MethodHandles.publicLookup().findStatic(RiskE.getClass(), "getseek",
          MethodType.methodType(double.class, Object.class));
      var risk = new double[1];
      risk[0] = (double) mh.invokeExact(RiskE);
      var RiskERiskE = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, risk.length);
+
      RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk[0]);
      var checker = RiskERiskE.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
      assert checker == risk[0];
-     mt = MethodType.methodType(double.class, double.class, MemorySegment.class);
-     mh = MethodHandles.lookup().findStatic(Info.class, "passerFunc", mt);
-     oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
-         ValueLayout.ADDRESS);
-
+     RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk[0]);
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-     ms = Linker.nativeLinker().upcallStub(mh, oned, foreign);
      var Solve1Dnative = Linker.nativeLinker().downcallHandle(
          safeqp.find("Solve1D").orElseThrow(),
          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
