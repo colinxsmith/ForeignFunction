@@ -14,7 +14,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
-
 public class OptimiserFunctions {
   public static double lm_eps = Math.abs((((double) 4) / 3 - 1) * 3 - 1); // Machine accuracy
   public static String libraryname = "safeqp";
@@ -779,38 +778,7 @@ public class OptimiserFunctions {
    MethodHandle mh = null;
    MemorySegment ms = null;
    FunctionDescriptor oned;
-   MethodHandles.Lookup lookup = MethodHandles.lookup();
-   class Info {
-     static double risk(double a) {
-       return a * a * a;
-     }
-
-     static double f1d(double as, double seek) {
-       return risk(as) - seek;
-     }
-
-     static double f1df1d(double as, Object passer) {
-       double back = -1;
-       MethodHandle mh = null;
-       MethodHandles.Lookup lookup = MethodHandles.lookup();
-       try {
-         mh = lookup.findStatic(passer.getClass(), "passer",
-             MethodType.methodType(double.class, double.class, Object.class));
-         back = (double) mh.invokeExact(as, passer);
-       } catch (Throwable u) {
-         System.out.println(u);
-       }
-       return back;
-     }
-
-     static double passerFunc(double a, MemorySegment passer) {
-       passer = passer.reinterpret(8);
-       var kk = passer.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
-       var back = f1d(a, kk);
-       return back;
-     }
-   }
-   try {
+   MethodHandles.Lookup lookup = MethodHandles.lookup(); try {
      Info kkf = new Info();
      mh = lookup.findStatic(kkf.getClass(), "f1df1d",
          MethodType.methodType(double.class, double.class, Object.class));
