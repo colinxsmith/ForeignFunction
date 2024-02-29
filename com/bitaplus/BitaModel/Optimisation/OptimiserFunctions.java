@@ -752,8 +752,7 @@ public class OptimiserFunctions {
  public static double TestInvoke(Object passer) {
    double back = -123;
    double r3=1.4422495703074083;
-   double []seeker=new double[1];
-   seeker[0]=3;
+   double seeker=3;
    MethodType mt;
    MethodHandle mh;
    MethodHandles.Lookup lookup = MethodHandles.publicLookup();
@@ -761,7 +760,7 @@ public class OptimiserFunctions {
    try {
      mh = lookup.findStatic(passer.getClass(), "passer", mt);
      back = (double) mh.invokeExact(r3, passer);
-     mh=lookup.findStatic(passer.getClass(),"tester", MethodType.methodType(double.class,double.class,double[].class));
+     mh=lookup.findStatic(passer.getClass(),"tester", MethodType.methodType(double.class,double.class,double.class));
      back=(double)mh.invokeExact(r3,seeker);
      mh=lookup.findStatic(passer.getClass(),"getseek", MethodType.methodType(double.class,Object.class));
      back=(double)mh.invokeExact(passer);
@@ -798,14 +797,13 @@ public class OptimiserFunctions {
    try (Arena foreign = Arena.ofConfined()) {
      mh = MethodHandles.publicLookup().findStatic(RiskE.getClass(), "getseek",
          MethodType.methodType(double.class, Object.class));
-     var risk = new double[1];
-     risk[0] = (double) mh.invokeExact(RiskE);
-     var RiskERiskE = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, risk.length);
+     var risk =     (double) mh.invokeExact(RiskE);
+     var RiskERiskE = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, 1);
 
-     RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk[0]);
-     var checker = RiskERiskE.getAtIndex(ValueLayout.JAVA_DOUBLE, 0);
-     assert checker == risk[0];
-     RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk[0]);
+     RiskERiskE.set(ValueLayout.JAVA_DOUBLE, 0, risk);
+     var checker = RiskERiskE.get(ValueLayout.JAVA_DOUBLE, 0);
+     assert checker == risk;
+     RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk);
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
      var Solve1Dnative = Linker.nativeLinker().downcallHandle(
          safeqp.find("Solve1D").orElseThrow(),

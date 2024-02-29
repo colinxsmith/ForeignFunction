@@ -5,25 +5,18 @@ import java.util.HashMap;
 
 import com.bitaplus.BitaModel.Optimisation.*;
 
-public class compat {
-    double seek;
-    public static double getseek(Object ppp){
-        return ((compat)ppp).seek;
-    }
-    public static double tester(double aa,double[] seeks){
-        return aa*aa*aa-seeks[0];
-    }
-    public static double passer(double aa,Object passer){
-        return ((compat)passer).f1d(aa);
-    }
-    double f1d(double a) {// For goal seek the function name f1d is defined in the SWIG interface code. We
-                          // must call it f1d
-        double back = a * a * a;
-        System.out.println("a=" + a + "\ta*a*a=" + back + "\tresult=" + (back - seek));
-        return (back - seek);
-    }
+/*
+Either 
+javac   --enable-preview  -Xlint:preview -source 21 compat.java
+java --enable-preview  --enable-native-access=ALL-UNNAMED compat
 
-    static { // Need this if it is not part of class OptimiserController
+                    OR
+
+java --enable-preview --source 21 --enable-native-access=ALL-UNNAMED compat.java
+*/
+public class compat {
+
+  /*  static { // Need this if it is not part of class OptimiserController
         try {
             System.loadLibrary("OptimiserController");
         } catch (UnsatisfiedLinkError e) {
@@ -35,7 +28,7 @@ public class compat {
             System.err.println("Native code library OptimiserController failed to load.\n" + e);
             // System.exit(1);
         }
-    }
+    }*/
 
     public static void main(String args[]) {
         System.out.println(OptimiserController.version());
@@ -212,7 +205,7 @@ public class compat {
         minRisk, maxRisk, ogamma, mask, 2, "OptJava.log", downrisk, downfactor, longbasket, shortbasket,
         tradebuy, tradesell, zetaS, zetaF, ShortCostScale, valuel, Abs_L);
  //       OptimiserFunctions.libraryname="C:\\Users\\colin\\COM64\\safeqp\\x64\\Debug\\safeqp.dll";
- //     OptimiserFunctions.libraryname="/home/colin/safeqp/libsafeqp.so";
+     OptimiserFunctions.libraryname="/home/colin/safeqp/libsafeqp.so";
         double[] wFFI= new double[n];
         back=OptimiserFunctions.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), wFFI, (long) m, AA, L, U,
                 alpha, bench, Q, gamma, initial, delta, buy, sell, kappa, basket, trades, revise, costs, min_hold,
@@ -227,13 +220,14 @@ public class compat {
         OptimiserFunctions.dsubvec(n,wJNI,wFFI,diff);
         assert OptimiserFunctions.ddotvec(n,diff,diff)<OptimiserFunctions.lm_eps;
         // Show how do a goal seek to find cube root of 3
-        compat solvetest = new compat();
+        Info solvetest = new Info();
         solvetest.seek = 3;
         var passdouble=new double[1];
         passdouble[0]=solvetest.seek;
+        double ggg = OptimiserController.Solve1D(solvetest, 0, 10, 0);
         System.out.println("Seek the cube root of " + solvetest.seek + " (" + Math.pow(3, 1.0 / 3.0) + ")");
         double gg=OptimiserFunctions.TestInvoke(solvetest);
-        double g = OptimiserFunctions.Solve1D(solvetest, 0, 10, 1e-15);
+        double g = OptimiserFunctions.Solve1D(solvetest, 0, 10, 0);
         double result = solvetest.f1d(g);
         System.out.println("\ng=" + g + "\tg*g*g=" + g * g * g + "\tresult=" + result);
     }
