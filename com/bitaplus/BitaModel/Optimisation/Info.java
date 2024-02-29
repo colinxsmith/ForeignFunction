@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+// compile with javac  --enable-preview  --source 21 -Xlint:preview  Info.java
 public class Info {
     static double risk(double a) {
       return a * a * a;
