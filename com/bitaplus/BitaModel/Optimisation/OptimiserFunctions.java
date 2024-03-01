@@ -772,7 +772,7 @@ public class OptimiserFunctions {
 
  public static double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
 
-   double back;
+   double back=-123456;
    MethodHandle passmh = null;
    MethodHandle mh = null;
    MemorySegment ms = null;
@@ -820,7 +820,6 @@ public class OptimiserFunctions {
          RiskERiskE);
    } catch (Throwable e) {
      System.out.println(e);
-     back = 0;
    }
    return back;
  }
