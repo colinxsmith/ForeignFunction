@@ -798,12 +798,11 @@ public class OptimiserFunctions {
      mh = MethodHandles.publicLookup().findStatic(RiskE.getClass(), "getseek",
          MethodType.methodType(double.class, Object.class));
      var risk =     (double) mh.invokeExact(RiskE);
-     var RiskERiskE = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, 1);
-
+     var RiskERiskE = foreign.allocate(8);
      RiskERiskE.set(ValueLayout.JAVA_DOUBLE, 0, risk);
-     var checker = RiskERiskE.get(ValueLayout.JAVA_DOUBLE, 0);
+     var checker = RiskERiskE.get(ValueLayout.JAVA_DOUBLE,0);
      assert checker == risk;
-     RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE, 0, risk);
+  //   RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE,0,risk);
      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
      var Solve1Dnative = Linker.nativeLinker().downcallHandle(
          safeqp.find("Solve1D").orElseThrow(),

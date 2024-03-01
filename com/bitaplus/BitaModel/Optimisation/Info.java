@@ -34,8 +34,10 @@ public class Info {
     return a * a * a;
   }
 
-  static double f1d(double as, double seek) {
-    return risk(as) - seek;
+  static double f1d(double a, double seek) {
+    var back=risk(a);
+    System.out.println("a=" + a + "\ta*a*a=" + back + "\tresult=" + (back - seek));
+    return back - seek;
   }
 
   static double f1df1d(double as, Object passer) {
