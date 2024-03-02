@@ -222,8 +222,6 @@ public class compat {
         // Show how do a goal seek to find cube root of 3
         Info solvetest = new Info();
         solvetest.seek = 3;
-        var passdouble=new double[1];
-        passdouble[0]=solvetest.seek;
         double ggg = OptimiserController.Solve1D(solvetest, 0, 10, 0);
         System.out.println("Seek the cube root of " + solvetest.seek + " (" + Math.pow(3, 1.0 / 3.0) + ")");
         double gg=OptimiserFunctions.TestInvoke(solvetest);
