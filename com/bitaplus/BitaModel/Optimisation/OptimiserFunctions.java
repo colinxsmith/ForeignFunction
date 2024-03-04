@@ -83,58 +83,88 @@ public class OptimiserFunctions {
    }
    catch (Throwable e) {       System.out.println(e);       back = "";       }
    return back;}
- 
-  public static double ddotvec(long n, double[] a, double[] b) {
-    double back;
-    try (Arena foreign = Arena.ofConfined()) {
+   public static  double ddotvec(long n, double[] a, double[] b) {
+    double back=-12345;
+    
+      try (Arena foreign = Arena.ofConfined()) { 
       final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var ddotvecnative = Linker.nativeLinker().downcallHandle(
-          safeqp.find("ddotvec").orElseThrow(),
-          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS,
-              ValueLayout.ADDRESS));
-      var A = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, a.length);
+      safeqp.find("ddotvec").orElseThrow(),
+      FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+        ValueLayout.JAVA_LONG ,
+        ValueLayout.ADDRESS ,
+        ValueLayout.ADDRESS ));
+    MemorySegment aa;
+    if(a==null){
+      aa = MemorySegment.NULL;}
+    else{	aa = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, a.length);}
+    if(a!=null){
       for (int i = 0; i < a.length; i++) {
-        A.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a[i]);
-      }
-      var B = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, b.length);
+        aa.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a[i]);}}
+    MemorySegment bb;
+    if(b==null){
+      bb = MemorySegment.NULL;}
+    else{	bb = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, b.length);}
+    if(b!=null){
       for (int i = 0; i < b.length; i++) {
-        B.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b[i]);
+        bb.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b[i]);}}
+      back = (double) ddotvecnative.invokeExact(
+        n ,
+        aa ,
+        bb );
+      if(a!=null) for (int i = 0; i < a.length; i++) {
+        a[i]=aa.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+      if(b!=null) for (int i = 0; i < b.length; i++) {
+        b[i]=bb.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
       }
-      back = (double) ddotvecnative.invokeExact(n, A, B);
-    } catch (Throwable e) {
-      System.out.println(e);
-      back = 0.0;
-    }
-    return back;
-  }
+      catch (Throwable e) {       System.out.println(e);       back = 0;       }
+      return back;}
+     public static  void dsubvec(long n, double[] a, double[] b, double[] c) {
 
-  public static void dsubvec(long n, double[] a, double[] b, double[] c) {
-    try (Arena foreign = Arena.ofConfined()) {
-      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-      var dsubvecnative = Linker.nativeLinker().downcallHandle(
-          safeqp.find("dsubvec").orElseThrow(),
-          FunctionDescriptor.ofVoid(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-              ValueLayout.ADDRESS));
-      var A = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, a.length);
-      for (int i = 0; i < a.length; i++) {
-        A.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a[i]);
-      }
-      var B = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, b.length);
-      for (int i = 0; i < b.length; i++) {
-        B.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b[i]);
-      }
-      var C = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, c.length);
-      for (int i = 0; i < b.length; i++) {
-        C.setAtIndex(ValueLayout.JAVA_DOUBLE, i, c[i]);
-      }
-      dsubvecnative.invokeExact(n, A, B, C);
-      for (int i = 0; i < b.length; i++) {
-        c[i] = C.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
-      }
-    } catch (Throwable e) {
-      System.out.println(e);
+    try (Arena foreign = Arena.ofConfined()) { 
+    final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+    var dsubvecnative = Linker.nativeLinker().downcallHandle(
+    safeqp.find("dsubvec").orElseThrow(),
+    FunctionDescriptor.ofVoid(
+      ValueLayout.JAVA_LONG ,
+      ValueLayout.ADDRESS ,
+      ValueLayout.ADDRESS ,
+      ValueLayout.ADDRESS ));
+  MemorySegment aa;
+  if(a==null){
+    aa = MemorySegment.NULL;}
+  else{	aa = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, a.length);}
+  if(a!=null){
+    for (int i = 0; i < a.length; i++) {
+      aa.setAtIndex(ValueLayout.JAVA_DOUBLE, i, a[i]);}}
+  MemorySegment bb;
+  if(b==null){
+    bb = MemorySegment.NULL;}
+  else{	bb = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, b.length);}
+  if(b!=null){
+    for (int i = 0; i < b.length; i++) {
+      bb.setAtIndex(ValueLayout.JAVA_DOUBLE, i, b[i]);}}
+  MemorySegment cc;
+  if(c==null){
+    cc = MemorySegment.NULL;}
+  else{	cc = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, c.length);}
+  if(c!=null){
+    for (int i = 0; i < c.length; i++) {
+      cc.setAtIndex(ValueLayout.JAVA_DOUBLE, i, c[i]);}}
+    dsubvecnative.invokeExact(
+      n ,
+      aa ,
+      bb ,
+      cc );
+    if(a!=null) for (int i = 0; i < a.length; i++) {
+      a[i]=aa.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+    if(b!=null) for (int i = 0; i < b.length; i++) {
+      b[i]=bb.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
+    if(c!=null) for (int i = 0; i < c.length; i++) {
+      c[i]=cc.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
     }
-  }public static  int days_left(String[] aversion) {
+    catch (Throwable e) {       System.out.println(e);             }}
+  public static  int days_left(String[] aversion) {
     int back; 
     aversion[0]="q";
    try (Arena foreign = Arena.ofConfined()) { 
@@ -242,33 +272,31 @@ public class OptimiserFunctions {
     } catch (Throwable e) {
       System.out.println(e);
     }
-  }
-
-  public static double dsumvec(long n, double[] ss) {
-    double back;
-    try (Arena foreign = Arena.ofConfined()) {
+  }public static  double dsumvec(long n, double[] ss) {
+    double back=-12345;
+    
+      try (Arena foreign = Arena.ofConfined()) { 
       final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
       var dsumvecnative = Linker.nativeLinker().downcallHandle(
-          safeqp.find("dsumvec").orElseThrow(),
-          FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
-              ValueLayout.JAVA_LONG,
-              ValueLayout.ADDRESS));
-      var ssss = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, ss.length);
+      safeqp.find("dsumvec").orElseThrow(),
+      FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+        ValueLayout.JAVA_LONG ,
+        ValueLayout.ADDRESS ));
+    MemorySegment ssss;
+    if(ss==null){
+      ssss = MemorySegment.NULL;}
+    else{	ssss = foreign.allocateArray(ValueLayout.JAVA_DOUBLE, ss.length);}
+    if(ss!=null){
       for (int i = 0; i < ss.length; i++) {
-        ssss.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ss[i]);
-      }
+        ssss.setAtIndex(ValueLayout.JAVA_DOUBLE, i, ss[i]);}}
       back = (double) dsumvecnative.invokeExact(
-          n,
-          ssss);
-      for (int i = 0; i < ss.length; i++) {
-        ss[i] = ssss.getAtIndex(ValueLayout.JAVA_DOUBLE, i);
+        n ,
+        ssss );
+      if(ss!=null) for (int i = 0; i < ss.length; i++) {
+        ss[i]=ssss.getAtIndex(ValueLayout.JAVA_DOUBLE, i);}
       }
-    } catch (Throwable e) {
-      System.out.println(e);
-      back = 0.0;
-    }
-    return back;
-  }
+      catch (Throwable e) {       System.out.println(e);       back = 0;       }
+      return back;}
 
   public static String version() {
     char[] buff = new char[400];
@@ -312,63 +340,79 @@ public class OptimiserFunctions {
       System.out.println(e);
     }
     return back;
-  }
-
-  public static  int pickoutstrings(long nstocks, String[] stocklist, long M_nstocks, String[] M_stocklist, String[] Q, long[] Order) {
-    int back; 
-   try (Arena foreign = Arena.ofConfined()) { 
-   final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-   var pickoutstringsnative = Linker.nativeLinker().downcallHandle(
-   safeqp.find("pickoutstrings").orElseThrow(),
-   FunctionDescriptor.of(ValueLayout.JAVA_INT,
-     ValueLayout.JAVA_LONG ,
-     ValueLayout.ADDRESS ,
-     ValueLayout.JAVA_LONG ,
-     ValueLayout.ADDRESS ,
-     ValueLayout.ADDRESS ,
-     ValueLayout.ADDRESS ));
-   var stockliststocklist = foreign.allocateArray(ValueLayout.ADDRESS, stocklist.length);
-   for (int i = 0; i < stocklist.length; i++) {
-     MemorySegment k5=foreign.allocateUtf8String(stocklist[i]);
-     k5.setUtf8String(0,stocklist[i]);
-     stockliststocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);}
-   var M_stocklistM_stocklist = foreign.allocateArray(ValueLayout.ADDRESS, M_stocklist.length);
-   for (int i = 0; i < M_stocklist.length; i++) {
-     MemorySegment k5=foreign.allocateUtf8String(M_stocklist[i]);
-     k5.setUtf8String(0,M_stocklist[i]);
-     M_stocklistM_stocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);}
-   var QQ = foreign.allocateArray(ValueLayout.ADDRESS, Q.length);
-   for (int i = 0; i < Q.length; i++) {
-     MemorySegment k5=foreign.allocateUtf8String(Q[i]);
-     k5.setUtf8String(0,Q[i]);
-     QQ.setAtIndex(ValueLayout.ADDRESS, i, k5);}
-   var OrderOrder = foreign.allocateArray(ValueLayout.JAVA_LONG, Order.length);
-   for (int i = 0; i < Order.length; i++) {
-     OrderOrder.setAtIndex(ValueLayout.JAVA_LONG, i, Order[i]);}
-   back = (int) pickoutstringsnative.invokeExact(
-     nstocks ,
-     stockliststocklist ,
-     M_nstocks ,
-     M_stocklistM_stocklist ,
-     QQ ,
-     OrderOrder );
-   for (int i = 0; i < stocklist.length; i++) {
-     var k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
-     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
-     stocklist[i] = k8.getUtf8String(0);}
-   for (int i = 0; i < M_stocklist.length; i++) {
-     var k8=M_stocklistM_stocklist.getAtIndex(ValueLayout.ADDRESS, i);
-     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
-     M_stocklist[i] = k8.getUtf8String(0);}
-   for (int i = 0; i < Q.length; i++) {
-     var k8=QQ.getAtIndex(ValueLayout.ADDRESS, i);
-     k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
-     Q[i] = k8.getUtf8String(0);}
-   for (int i = 0; i < Order.length; i++) {
-     Order[i]=OrderOrder.getAtIndex(ValueLayout.JAVA_LONG, i);}
-   }
-   catch (Throwable e) {       System.out.println(e);       back = 0;       }
-   return back;}
+  }public static  int pickoutstrings(long nstocks, String[] stocklist, long M_nstocks, String[] M_stocklist, String[] Q, long[] Order) {
+    int back=-12345;
+    
+      try (Arena foreign = Arena.ofConfined()) { 
+      final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+      var pickoutstringsnative = Linker.nativeLinker().downcallHandle(
+      safeqp.find("pickoutstrings").orElseThrow(),
+      FunctionDescriptor.of(ValueLayout.JAVA_INT,
+        ValueLayout.JAVA_LONG ,
+        ValueLayout.ADDRESS ,
+        ValueLayout.JAVA_LONG ,
+        ValueLayout.ADDRESS ,
+        ValueLayout.ADDRESS ,
+        ValueLayout.ADDRESS ));
+    MemorySegment stockliststocklist;
+    if(stocklist==null){
+      stockliststocklist = MemorySegment.NULL;}
+    else{	stockliststocklist = foreign.allocateArray(ValueLayout.ADDRESS, stocklist.length);}
+    if(stocklist!=null){
+      for (int i = 0; i < stocklist.length; i++) {
+        MemorySegment k5=foreign.allocateUtf8String(stocklist[i]);
+        k5.setUtf8String(0,stocklist[i]);
+        stockliststocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);}}
+    MemorySegment M_stocklistM_stocklist;
+    if(M_stocklist==null){
+      M_stocklistM_stocklist = MemorySegment.NULL;}
+    else{	M_stocklistM_stocklist = foreign.allocateArray(ValueLayout.ADDRESS, M_stocklist.length);}
+    if(M_stocklist!=null){
+      for (int i = 0; i < M_stocklist.length; i++) {
+        MemorySegment k5=foreign.allocateUtf8String(M_stocklist[i]);
+        k5.setUtf8String(0,M_stocklist[i]);
+        M_stocklistM_stocklist.setAtIndex(ValueLayout.ADDRESS, i, k5);}}
+    MemorySegment QQ;
+    if(Q==null){
+      QQ = MemorySegment.NULL;}
+    else{	QQ = foreign.allocateArray(ValueLayout.ADDRESS, Q.length);}
+    if(Q!=null){
+      for (int i = 0; i < Q.length; i++) {
+        MemorySegment k5=foreign.allocateUtf8String(Q[i]);
+        k5.setUtf8String(0,Q[i]);
+        QQ.setAtIndex(ValueLayout.ADDRESS, i, k5);}}
+    MemorySegment OrderOrder;
+    if(Order==null){
+      OrderOrder = MemorySegment.NULL;}
+    else{	OrderOrder = foreign.allocateArray(ValueLayout.JAVA_LONG, Order.length);}
+    if(Order!=null){
+      for (int i = 0; i < Order.length; i++) {
+        OrderOrder.setAtIndex(ValueLayout.JAVA_LONG, i, Order[i]);}}
+      back = (int) pickoutstringsnative.invokeExact(
+        nstocks ,
+        stockliststocklist ,
+        M_nstocks ,
+        M_stocklistM_stocklist ,
+        QQ ,
+        OrderOrder );
+      if(stocklist!=null) for (int i = 0; i < stocklist.length; i++) {
+        var k8=stockliststocklist.getAtIndex(ValueLayout.ADDRESS, i);
+        k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+        stocklist[i] = k8.getUtf8String(0);}
+      if(M_stocklist!=null) for (int i = 0; i < M_stocklist.length; i++) {
+        var k8=M_stocklistM_stocklist.getAtIndex(ValueLayout.ADDRESS, i);
+        k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+        M_stocklist[i] = k8.getUtf8String(0);}
+      if(Q!=null) for (int i = 0; i < Q.length; i++) {
+        var k8=QQ.getAtIndex(ValueLayout.ADDRESS, i);
+        k8 = k8.reinterpret(Long.MAX_VALUE);// This is essential
+        Q[i] = k8.getUtf8String(0);}
+      if(Order!=null) for (int i = 0; i < Order.length; i++) {
+        Order[i]=OrderOrder.getAtIndex(ValueLayout.JAVA_LONG, i);}
+      }
+      catch (Throwable e) {       System.out.println(e);       back = 0;       }
+      return back;}
+    
    public static  short Optimise_internalCVPAFbl(long n, int nfac, String[] stocknames, double[] w_opt, long m, double[][] AAA, double[] L, double[] U, double[] alpha, double[] benchmark, double[] QMATRIX, double gamma, double[] Initial, double delta, double[] buy, double[] sell, double kappa, int basket, int trades, int revise, int costs, double min_holding, double min_trade, int m_LS, int Fully_Invested, double Rmin, double Rmax, int m_Round, double[] min_lot, double[] size_lot, int[] shake, long ncomp, double[] Composite, double LSValue, long npiece, double[] hpiece, double[] pgrad, long nabs, double[][] Abs_A, long mabs, long[] I_A, double[] Abs_U, double[] FFC, double[][] FLOAD, double[] SSV, double minRisk, double maxRisk, double[] ogamma, double[] mask, int log, String logfile, int downrisk, double downfactor, int longbasket, int shortbasket, int tradebuy, int tradesell, double zetaS, double zetaF, double ShortCostScale, double LSValuel, double[] Abs_L) {
     short back; 
    try (Arena foreign = Arena.ofConfined()) { 
@@ -768,60 +812,79 @@ public class OptimiserFunctions {
      System.out.println(d);
    }
    return back;
- }
-
- public static double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
-
-   double back=-123456;
-   MethodHandle passmh = null;
-   MethodHandle mh = null;
-   MemorySegment ms = null;
-   FunctionDescriptor oned;
-   MethodHandles.Lookup lookup = MethodHandles.lookup(); try {
-     Info kkf = new Info();
-     mh = lookup.findStatic(kkf.getClass(), "f1df1d",
-         MethodType.methodType(double.class, double.class, Object.class));
-     var testf1d = (double) mh.invokeExact(1.5, RiskE);
-     assert testf1d == 0.375;
-     mh = lookup.findStatic(Info.class, "passerFunc",
-         MethodType.methodType(double.class, double.class, MemorySegment.class));
-
-     oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
-         ValueLayout.ADDRESS);
-     ms = Linker.nativeLinker().upcallStub(mh, oned, Arena.ofAuto());
-     passmh = lookup.findStatic(RiskE.getClass(), "passer",
-         MethodType.methodType(double.class, double.class, Object.class));
-   } catch (Throwable u) {
-     System.out.println(u);
-   }
-   try (Arena foreign = Arena.ofConfined()) {
-     mh = MethodHandles.publicLookup().findStatic(RiskE.getClass(), "getseek",
-         MethodType.methodType(double.class, Object.class));
-     var risk =     (double) mh.invokeExact(RiskE);
-     var RiskERiskE = foreign.allocate(8);
-     RiskERiskE.set(ValueLayout.JAVA_DOUBLE, 0, risk);
-     var checker = RiskERiskE.get(ValueLayout.JAVA_DOUBLE,0);
-     assert checker == risk;
-  //   RiskERiskE.setAtIndex(ValueLayout.JAVA_DOUBLE,0,risk);
-     final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
-     var Solve1Dnative = Linker.nativeLinker().downcallHandle(
-         safeqp.find("Solve1D").orElseThrow(),
-         FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
-             ValueLayout.ADDRESS,
-             ValueLayout.JAVA_DOUBLE,
-             ValueLayout.JAVA_DOUBLE,
-             ValueLayout.JAVA_DOUBLE,
-             ValueLayout.ADDRESS));
-     back = (double) Solve1Dnative.invokeExact(
-         ms,
-         gammabot,
-         gammatop,
-         tol,
-         RiskERiskE);
-   } catch (Throwable e) {
-     System.out.println(e);
-   }
-   return back;
- }
-
+ }public static  double Solve1D(Object RiskE, double gammabot, double gammatop, double tol) {
+  double back=-12345;
+  
+  MethodHandle mh = null;
+  MemorySegment ms = null;
+  FunctionDescriptor oned;
+  MethodHandles.Lookup lookup = MethodHandles.lookup(); try {
+  mh = lookup.findStatic(Info.class, "passerFunc",
+  MethodType.methodType(double.class, double.class, MemorySegment.class));
+  oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,ValueLayout.ADDRESS);
+  ms = Linker.nativeLinker().upcallStub(mh, oned, Arena.ofAuto());
+  } catch (Throwable u) {
+  System.out.println(u);	}
+  
+    try (Arena foreign = Arena.ofConfined()) { 
+    final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+  mh = MethodHandles.publicLookup().findStatic(RiskE.getClass(), "getseek",
+    MethodType.methodType(double.class, Object.class));
+  var risk =     (double) mh.invokeExact(RiskE);
+  var RiskERiskE = foreign.allocate(8);
+  RiskERiskE.set(ValueLayout.JAVA_DOUBLE, 0, risk);
+    var Solve1Dnative = Linker.nativeLinker().downcallHandle(
+    safeqp.find("Solve1D").orElseThrow(),
+    FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+      ValueLayout.ADDRESS ,
+      ValueLayout.JAVA_DOUBLE ,
+      ValueLayout.JAVA_DOUBLE ,
+      ValueLayout.JAVA_DOUBLE ,
+      ValueLayout.ADDRESS ));
+    back = (double) Solve1Dnative.invokeExact(
+      ms ,
+      gammabot ,
+      gammatop ,
+      tol ,
+      RiskERiskE );
+    }
+    catch (Throwable e) {       System.out.println(e);       back = 0;       }
+    return back;}
+    public static  double PathMin(Object RiskE, double gammabot, double gammatop, double tol, int stopifpos) {
+      double back=-12345;
+      /* If an argument is of type Object it will mean that
+      it is a function. The java generated here is not complete.
+      It is only 100% correct for Solve1D, otherwise some editing will be needed*/
+      
+      MethodHandle mh = null;
+      MemorySegment ms = null;
+      FunctionDescriptor oned;
+      MethodHandles.Lookup lookup = MethodHandles.lookup(); try {
+      mh = lookup.findStatic(Info.class, "passerMinFunc",
+      MethodType.methodType(double.class, double.class, MemorySegment.class));
+      oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,ValueLayout.ADDRESS);
+      ms = Linker.nativeLinker().upcallStub(mh, oned, Arena.ofAuto());
+      } catch (Throwable u) {
+      System.out.println(u);	}
+      
+        try (Arena foreign = Arena.ofConfined()) { 
+        final var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);
+        var PathMinnative = Linker.nativeLinker().downcallHandle(
+        safeqp.find("PathMin").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE,
+          ValueLayout.ADDRESS ,
+          ValueLayout.JAVA_DOUBLE ,
+          ValueLayout.JAVA_DOUBLE ,
+          ValueLayout.JAVA_DOUBLE ,
+          ValueLayout.JAVA_INT ));
+        back = (double) PathMinnative.invokeExact(
+          ms ,
+          gammabot ,
+          gammatop ,
+          tol ,
+          stopifpos  );
+        }
+        catch (Throwable e) {       System.out.println(e);       back = 0;       }
+        return back;}
+      
 }

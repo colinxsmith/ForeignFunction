@@ -61,4 +61,8 @@ public class Info {
     var back = f1d(a, kk);
     return back;
   }
+  static double passerMinFunc(double a, MemorySegment passer) {
+    var back = f1d(a, 0);
+    return back;
+  }
 }

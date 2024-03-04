@@ -205,7 +205,7 @@ public class compat {
         minRisk, maxRisk, ogamma, mask, 2, "OptJava.log", downrisk, downfactor, longbasket, shortbasket,
         tradebuy, tradesell, zetaS, zetaF, ShortCostScale, valuel, Abs_L);
  //       OptimiserFunctions.libraryname="C:\\Users\\colin\\COM64\\safeqp\\x64\\Debug\\safeqp.dll";
-     OptimiserFunctions.libraryname="/home/colin/safeqp/libsafeqp.so";
+ //    OptimiserFunctions.libraryname="/home/colin/safeqp/libsafeqp.so";
         double[] wFFI= new double[n];
         back=OptimiserFunctions.Optimise_internalCVPAFbl((long) n, nfac, DATA.get("names"), wFFI, (long) m, AA, L, U,
                 alpha, bench, Q, gamma, initial, delta, buy, sell, kappa, basket, trades, revise, costs, min_hold,
@@ -223,11 +223,15 @@ public class compat {
         Info solvetest = new Info();
         solvetest.seek = 3;
         double ggg = OptimiserController.Solve1D(solvetest, 0, 10, 0);
+        double result = solvetest.f1d(ggg);
+        System.out.println("\ng=" + ggg + "\tg*g*g=" + ggg * ggg * ggg + "\tresult=" + result);
         System.out.println("Seek the cube root of " + solvetest.seek + " (" + Math.pow(3, 1.0 / 3.0) + ")");
         double gg=OptimiserFunctions.TestInvoke(solvetest);
+        System.out.println("Seek "+gg);
         double g = OptimiserFunctions.Solve1D(solvetest, 0, 10, 0);
-        double result = solvetest.f1d(g);
+        result = solvetest.f1d(g);
         System.out.println("\ng=" + g + "\tg*g*g=" + g * g * g + "\tresult=" + result);
+        g = OptimiserFunctions.PathMin(solvetest, 0, 10,1e-9,0);
     }
 
 }

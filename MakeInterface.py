@@ -12,6 +12,9 @@ for arg in argv:
     #print(line)
     if i==1:break
     i+=1
+haveObject=0
+RR=''
+if line.find('Object')>-1:haveObject=1
 allargs=[re.sub('^.* ','',part) for part in (line.split('(')[1].replace(')','')).split(',')]
 #Attempt to get the arguments correct for java's twoD2oneD, but check the final outcome
 returnObj=line.split(' ')[0].strip()
@@ -19,12 +22,37 @@ funcName=re.sub('\(.*','',line.split(' ')[1]).strip()
 parts=re.sub('^.*\(','',line)
 parts=re.sub('\).*','',parts).split(',')
 print('public static ',line,'{')
-if returnObj=='void':
+if returnObj!='void':
+    if returnObj=='String':print('%s back="";'%(returnObj))
+    else :print('%s back=-12345;'%(returnObj))
+if haveObject==1:    
+    print('/* If an argument is of type Object it will mean that')
+    print('it is a function. The java generated here is not complete.')
+    print('It is only 100% correct for Solve1D, otherwise some editing will be needed*/')
+    RR=line.split('Object')[1].strip().split(',')[0]
+    print('')
+    print('MethodHandle mh = null;')
+    print('MemorySegment ms = null;')
+    print('FunctionDescriptor oned;')
+    print('MethodHandles.Lookup lookup = MethodHandles.lookup(); try {')
+    print('mh = lookup.findStatic(Info.class, "passerFunc",')
+    print('MethodType.methodType(double.class, double.class, MemorySegment.class));')
+    print('oned = FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,ValueLayout.ADDRESS);')
+    print('ms = Linker.nativeLinker().upcallStub(mh, oned, Arena.ofAuto());')
+    print('} catch (Throwable u) {')
+    print('System.out.println(u);\t}')
     print('\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);')
+    print('mh = MethodHandles.publicLookup().findStatic(%s.getClass(), "getseek",'%(RR))
+    print('\tMethodType.methodType(double.class, Object.class));')
+    print('var risk =     (double) mh.invokeExact(RiskE);')
+    print('var %s%s = foreign.allocate(8);'%(RR,RR))
+    print('%s%s.set(ValueLayout.JAVA_DOUBLE, 0, risk);'%(RR,RR))
+
+if haveObject==0:print('\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);')
+if returnObj=='void':
     print('\tvar %snative = Linker.nativeLinker().downcallHandle('%(funcName))
     print('\tsafeqp.find("%s").orElseThrow(),'%funcName)
 else: 
-    print('\t',returnObj,'back;','\n\ttry (Arena foreign = Arena.ofConfined()) {','\n\tfinal var safeqp = SymbolLookup.libraryLookup(libraryname, foreign);')
     print('\tvar %snative = Linker.nativeLinker().downcallHandle('%(funcName))
     print('\tsafeqp.find("%s").orElseThrow(),'%funcName)
 if returnObj=='void':print('\tFunctionDescriptor.ofVoid(')
@@ -40,6 +68,13 @@ elif returnObj=='byte[]' :print('\tFunctionDescriptor.of(ValueLayout.ADDRESS,')
 np=len(parts)
 ip=0
 ending=','
+if haveObject:
+    for ip in range(np):
+        if parts[ip].find(RR):
+            parts[ip]=parts[ip].replace(RR,'ms')
+    parts.append('MemorySegment %s'%(RR+RR))
+np=len(parts)
+ip=0
 for part in parts:
     part=part.strip()
     if ip==(np-1):ending='));'
@@ -47,6 +82,7 @@ for part in parts:
     if argtype.find('[')>-1:argtype='address'
     if argtype=='double':print('\t\tValueLayout.JAVA_DOUBLE',ending)
     elif argtype=='long':print('\t\tValueLayout.JAVA_LONG',ending)
+    elif argtype=='MemorySegment':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='Object':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='String':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='int':print('\t\tValueLayout.JAVA_INT',ending)
