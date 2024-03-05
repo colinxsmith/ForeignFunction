@@ -35,7 +35,7 @@ public class Info {
   }
 
   static double f1d(double a, double seek) {
-    var back=risk(a);
+    var back = risk(a);
     System.out.println("a=" + a + "\ta*a*a=" + back + "\tresult=" + (back - seek));
     return back - seek;
   }
@@ -54,15 +54,19 @@ public class Info {
     return back;
   }
 
-  static double passerFunc(double a, MemorySegment passer) {
-    if (passer.byteSize() == 0)
+  public static double passerFunc(double a, MemorySegment passer) {
+    if (passer != null && passer.byteSize() == 0)
       passer = passer.reinterpret(8);
     var kk = passer.get(ValueLayout.JAVA_DOUBLE, 0);
     var back = f1d(a, kk);
     return back;
   }
-  static double passerMinFunc(double a, MemorySegment passer) {
-    var back = f1d(a, 0);
+
+  public static double passerMinFunc(double a, MemorySegment passer) {
+    if (passer != null && passer.byteSize() == 0)
+      passer = passer.reinterpret(8);
+    var back = (a - 5) * (a - 3) + Math.exp((a - 5) * (a - 3));
+    System.out.println("a=" + a + " value;" + back);
     return back;
   }
 }
