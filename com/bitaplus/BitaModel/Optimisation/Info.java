@@ -66,7 +66,7 @@ public class Info {
     if (passer != null && passer.byteSize() == 0)
       passer = passer.reinterpret(8);
     var back = (a - 5) * (a - 3) + Math.exp((a - 5) * (a - 3));
-    System.out.println("a=" + a + " value;" + back);
+    System.out.println("a=" + a + " value;" + back+" "+(-1.0+Math.exp(-1.0)));
     return back;
   }
 }
