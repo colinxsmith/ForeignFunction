@@ -1495,7 +1495,6 @@ public class OptimiserFunctions {
     }
     return back;
   }
-
   public static  short CvarOptimiseCR(long n, long tlen, double[] DATA, long number_included, double CVar_averse, double getRisk, String[] stocknames, double[] w_opt, long m, double[][] AAA, double[] L, double[] U, double[] alpha, double[] benchmark, double[] Q, double gamma, double[] initial, double delta, int basket, int trades, int revise, double[] min_holding, double[] min_trade, int m_LS, int Fully_Invested, double Rmin, double Rmax, int round, double[] min_lot, double[] size_lot, int[] shake, double LSValue, long nabs, double[][] Abs_A, long mabs, long[] I_A, double[] Abs_U, double[] ogamma, double[] mask, int log, String logfile, int longbasket, int shortbasket, double LSValuel, double[] Abs_L, int costs, double[] buy, double[] sell, int CVar_constraint, double CVarMin, double CVarMax, short relCvar) {
     short back=-12345;
     
@@ -1555,6 +1554,7 @@ public class OptimiserFunctions {
         ValueLayout.JAVA_INT ,
         ValueLayout.JAVA_DOUBLE ,
         ValueLayout.JAVA_DOUBLE ,
+        ValueLayout.JAVA_SHORT ));
     MemorySegment DATADATA;
     if(DATA==null){
       DATADATA = MemorySegment.NULL;}
@@ -1578,7 +1578,7 @@ public class OptimiserFunctions {
     if(w_opt!=null){
       for (int i = 0; i < w_opt.length; i++) {
         w_optw_opt.setAtIndex(ValueLayout.JAVA_DOUBLE, i, w_opt[i]);}}
-      double[] AAA1d = twoD2oneD((int) m, (int) n, AAA);	//Get the integer arguments correct!
+      double[] AAA1d = twoD2oneD((int) CVar_averse, (int) n, AAA);	//Get the integer arguments correct!
     MemorySegment AAA1dAAA1d;
     if(AAA1d==null){
       AAA1dAAA1d = MemorySegment.NULL;}
@@ -1827,7 +1827,7 @@ public class OptimiserFunctions {
       }
       catch (Throwable e) {       System.out.println(e);       back = 0;       }
       return back;}
-
+    
   public static short CvarOptimiseC(long n, long tlen, double[] DATA, long number_included, double CVar_averse,
       double getRisk, String[] stocknames, double[] w_opt, long m, double[][] AAA, double[] L, double[] U,
       double[] alpha, double[] benchmark, double[] Q, double gamma, double[] initial, double delta, int basket,

@@ -86,6 +86,7 @@ for part in parts:
     elif argtype=='Object':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='String':print('\t\tValueLayout.ADDRESS',ending)
     elif argtype=='int':print('\t\tValueLayout.JAVA_INT',ending)
+    elif argtype=='short':print('\t\tValueLayout.JAVA_SHORT',ending)
     elif argtype=='address':print('\t\tValueLayout.ADDRESS',ending)
     ip+=1
 
